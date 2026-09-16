@@ -1,5 +1,5 @@
 [project]
-name = "noteveil"
+name = "everwrap"
 version = "0.0.1"
 description = "Local privacy boundary for Evernote MCP — synthetic feasibility study"
 requires-python = ">=3.12,<3.14"

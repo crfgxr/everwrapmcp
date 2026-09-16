@@ -1,4 +1,4 @@
-# NoteVeil
+# EverWrap
 
 A proposed local privacy boundary between Evernote and cloud assistants.
 
