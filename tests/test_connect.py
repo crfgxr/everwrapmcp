@@ -3,7 +3,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from everwrap.connect import LoopbackCallback, inspect_read_schema, parse_callback
+from everwrap.connect import (
+    CALLBACK_URL, SERVER_URL, LoopbackCallback, ReadOnlyOAuthProvider,
+    OAuthClientProvider, OAuthClientMetadata, OAuthToken, inspect_read_schema,
+    parse_callback, require_read_only,
+)
 
 
 @pytest.mark.parametrize("target", [
@@ -59,3 +63,61 @@ def test_setup_discovers_schema_without_reading_any_note():
     result = asyncio.run(inspect_read_schema(client))
     assert result["name"] == "get_note"
     assert client.calls == [None]
+
+
+def test_sign_in_link_survives_browser_launch_failure(monkeypatch, capsys):
+    monkeypatch.setattr("everwrap.connect.webbrowser.open", lambda url: False)
+    url = "https://accounts.evernote.com/auth/authorize?state=fake&scope=read"
+
+    async def run():
+        callback = LoopbackCallback()
+        await callback.open_browser(url)
+        assert callback.expected_state == "fake"
+
+    asyncio.run(run())
+    assert url in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("scope", ["", "write", "read+write", "read&scope=delete"])
+def test_sign_in_rejects_broader_or_missing_scopes(scope, monkeypatch):
+    calls = []
+    monkeypatch.setattr("everwrap.connect.webbrowser.open", lambda url: calls.append(url))
+
+    async def run():
+        callback = LoopbackCallback()
+        with pytest.raises(ValueError):
+            await callback.open_browser(
+                "https://accounts.evernote.com/auth/authorize?state=fake&scope=" + scope)
+
+    asyncio.run(run())
+    assert calls == []
+
+
+def test_read_only_scope_is_restored_after_sdk_discovery(monkeypatch):
+    observed = []
+
+    async def parent_authorization(self):
+        observed.append(self.context.client_metadata.scope)
+        return "synthetic-token-request"
+
+    monkeypatch.setattr(OAuthClientProvider, "_perform_authorization", parent_authorization)
+    provider = ReadOnlyOAuthProvider(
+        server_url=SERVER_URL,
+        client_metadata=OAuthClientMetadata(redirect_uris=[CALLBACK_URL], scope="read"),
+        storage=SimpleNamespace(),
+    )
+    provider.context.client_metadata.scope = "read create write delete"
+    assert asyncio.run(provider._perform_authorization()) == "synthetic-token-request"
+    assert observed == ["read"]
+
+
+@pytest.mark.parametrize("scope", [None, "", "write", "read write", "read delete"])
+def test_broader_or_unidentified_token_grants_are_rejected(scope):
+    token = OAuthToken(access_token="synthetic", token_type="Bearer", scope=scope)
+    with pytest.raises(ValueError):
+        require_read_only(token)
+
+
+def test_read_only_token_is_accepted():
+    token = OAuthToken(access_token="synthetic", token_type="Bearer", scope="read")
+    assert require_read_only(token) is token

@@ -90,6 +90,12 @@ are stored in the macOS Keychain under `EverWrap:official-evernote-mcp`, never i
 the repository. This same-user Keychain storage is not isolation from an agent
 with unrestricted access to your user account. The runtime isolation gate remains.
 
+Consent is restricted to the `read` scope. Broader token grants are rejected.
+SDK 2.2.0 replaces caller scopes during discovery, so a pinned authorization hook
+restores `read` immediately before generating consent. A regression test covers
+that behavior. If browser launch fails, the command prints the same sign-in link
+for manual use on this Mac. Never share the callback URL containing the code.
+
 Run the focused tests with:
 
 ```sh

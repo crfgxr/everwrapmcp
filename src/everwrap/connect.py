@@ -27,6 +27,25 @@ CALLBACK_URL = "http://127.0.0.1:8766/callback"
 KEYCHAIN_SERVICE = "EverWrap:official-evernote-mcp"
 
 
+class ReadOnlyOAuthProvider(OAuthClientProvider):
+    """Pin consent to read, including after the SDK's scope discovery.
+
+    MCP SDK 2.2.0 overwrites client_metadata.scope using advertised scopes.
+    This small version-pinned hook constrains the final authorization request;
+    the redirect handler and token store independently enforce the same policy.
+    """
+
+    async def _perform_authorization(self):
+        self.context.client_metadata.scope = "read"
+        return await super()._perform_authorization()
+
+
+def require_read_only(tokens):
+    if not tokens.scope or set(tokens.scope.split()) != {"read"}:
+        raise ValueError("EverWrap requires a read-only OAuth grant.")
+    return tokens
+
+
 class KeychainStore:
     def __init__(self):
         # Explicit backend: never silently falls back to plaintext token storage.
@@ -34,9 +53,10 @@ class KeychainStore:
 
     async def get_tokens(self):
         value = await asyncio.to_thread(self._keyring.get_password, KEYCHAIN_SERVICE, "tokens")
-        return OAuthToken.model_validate_json(value) if value else None
+        return require_read_only(OAuthToken.model_validate_json(value)) if value else None
 
     async def set_tokens(self, tokens):
+        require_read_only(tokens)
         await asyncio.to_thread(self._keyring.set_password, KEYCHAIN_SERVICE,
                                 "tokens", tokens.model_dump_json())
 
@@ -74,13 +94,23 @@ class LoopbackCallback:
                 or not url.hostname or not (url.hostname == "evernote.com"
                 or url.hostname.endswith(".evernote.com"))):
             raise ValueError("Unexpected authorization host.")
-        states = parse_qs(url.query).get("state", [])
+        params = parse_qs(url.query)
+        states = params.get("state", [])
         if len(states) != 1 or not states[0]:
             raise ValueError("Missing authorization state.")
+        if params.get("scope") != ["read"]:
+            raise ValueError("Authorization must request read-only access.")
         self.expected_state = states[0]
-        if not await asyncio.to_thread(webbrowser.open, authorization_url):
-            raise RuntimeError("Could not open the sign-in browser.")
-        print("Evernote sign-in opened in your browser. Complete it there.", flush=True)
+        # This URL contains a public client ID, state, and PKCE challenge, not
+        # the verifier, authorization code, or access/refresh tokens.
+        print("Authorize EverWrap with read-only access:", flush=True)
+        print(authorization_url, flush=True)
+        try:
+            opened = await asyncio.to_thread(webbrowser.open, authorization_url)
+        except Exception:
+            opened = False
+        print("Complete Evernote sign-in in the browser." if opened else
+              "Open the link above on this Mac to complete sign-in.", flush=True)
 
     async def wait(self):
         return await asyncio.wait_for(self.result, timeout=600)
@@ -130,21 +160,22 @@ async def connect():
     root = Path(__file__).resolve().parents[2]
     SingleNotePolicy.from_file(root / ".everwrap-local.json")
     callback = LoopbackCallback()
-    oauth = OAuthClientProvider(
+    oauth = ReadOnlyOAuthProvider(
         server_url=SERVER_URL,
         client_metadata=OAuthClientMetadata(
             client_name="EverWrap local single-note test",
             redirect_uris=[AnyUrl(CALLBACK_URL)],
             token_endpoint_auth_method="none",
+            scope="read",
         ),
         storage=KeychainStore(), redirect_handler=callback.open_browser,
         callback_handler=callback.wait,
     )
     listener = await asyncio.start_server(callback.handle, "127.0.0.1", 8766, limit=8192)
     async with listener:
-        async with httpx2.AsyncClient(auth=oauth, timeout=httpx2.Timeout(30, connect=10)) as http:
+        async with httpx2.AsyncClient(auth=oauth, timeout=httpx2.Timeout(60, connect=30)) as http:
             transport = streamable_http_client(SERVER_URL, http_client=http)
-            async with Client(transport, read_timeout_seconds=60) as client:
+            async with Client(transport, read_timeout_seconds=660) as client:
                 schema = await inspect_read_schema(client)
                 print("Connected. No notes were read.")
                 print(json.dumps(schema, indent=2))

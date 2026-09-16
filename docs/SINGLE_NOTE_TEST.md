@@ -51,6 +51,14 @@ GitHub, and `mcp.evernote.com:443` timed out from the local shell. No successful
 OAuth exchange, live tool schema, or live note read has been verified. Retry the
 documented setup command once local connectivity is restored.
 
+Later setup check: the direct Codex `evernote_mcp` entry was removed, and its
+unfinished login process was cancelled. The endpoint became reachable. The
+wrapper then blocked SDK scope discovery widening `read` to all advertised
+scopes; this is fixed with a version-pinned scope constraint and grant validation.
+80 focused tests now pass. An EverWrap-specific read-only consent link has been
+generated. Authentication is not complete until the callback and token exchange
+succeed; generating a consent link does not establish note access.
+
 This code is a prototype application-level restriction. It is not an OS sandbox,
 and it cannot constrain an agent with write access to the code or separate access
 to backend credentials. Runtime isolation remains a separate deployment task.
