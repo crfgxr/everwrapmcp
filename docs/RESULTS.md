@@ -1,6 +1,7 @@
 # Baseline result — 2026-09-17
 
-**Decision: do not connect real notes.**
+**Decision: keep note-content access disabled.** Read-only OAuth and schema
+discovery are verified; no note content has been fetched.
 
 Presidio 2.2.364, spaCy 3.8.16, en_core_web_lg 3.8.0, Python 3.12.13.
 Exact package resolution is in uv.lock.
@@ -20,7 +21,24 @@ obfuscation, and transformations remain necessary. This evaluates stock Presidio
 with English NLP, not the custom recognizers proposed in the handoff and not a
 Turkish NLP configuration.
 
-Next experiment: add independent deterministic secret handling and select a local
-Turkish-capable NLP model, then evaluate new held-out cases as well as regressions.
-Authorization, MCP transport, upstream integration, logging isolation, and OS
-isolation are unimplemented and untested. No real Evernote data was accessed.
+Next experiment: add independent deterministic secret handling and suitable local
+NLP for both English and Turkish. Evaluate contextual names, dates, birthdays,
+and addresses in each language, using new held-out cases as well as regressions.
+The passing English person example does not establish English privacy coverage.
+
+## Integration checks — 2026-09-17
+
+The latest focused suite passed 92 tests covering single-note authorization,
+explicit block-list precedence, OAuth setup safeguards, and the MCP boundary.
+These tests use synthetic fixtures and do not validate production redaction.
+
+Read-only OAuth completed and the official `get_note` input schema was inspected.
+The local wrapper was registered with Codex. Calls through its exposed MCP tool
+returned a privacy-gate error for the allowed dummy and a policy denial for an
+excluded note. A fresh stdio process also verified the configured denial.
+Neither check fetched note content.
+
+The live fetch adapter, production sanitizer, exact-output review, and OS
+isolation remain unimplemented. Static error and canary tests cover selected
+leakage paths, not a complete logging-isolation guarantee. The six baseline
+release-gate failures remain unresolved; the focused suite does not replace them.

@@ -22,7 +22,7 @@ challenge set, not a claim that the English model supports Turkish.
 ```sh
 uv sync
 uv run python -m experiments.baseline
-uv run pytest
+uv run pytest tests/test_benchmark.py tests/test_release_gate.py
 ```
 
 Model installation downloads public weights. Inference runs locally. No real notes
@@ -33,7 +33,8 @@ small corpus would not prove general privacy.
 
 ## Gates before integration
 
-- Validate English and Turkish NLP, including contextual names, dates, birthdays, and addresses in both languages.
+- Validate English and Turkish NLP, including contextual names, dates, birthdays,
+  and addresses in both languages.
 - Add deterministic secret blocking, including encoded/obfuscated variants.
 - Test unauthorized direct IDs, untrusted search results, membership changes,
   malformed responses, sanitizer errors, metadata leakage, and log leakage.
@@ -62,6 +63,11 @@ wins even if an ID is also the allowed note, and applies to both reads and the
 single-note search. IDs are case-insensitive. Keep this list in the ignored local
 configuration; restart the MCP connection after policy edits. Other notes remain
 denied by default whether or not they appear in the block list.
+
+The block list is private local data. Commit only the empty example, policy code,
+and synthetic fixtures. Do not copy actual IDs or Evernote links into documentation,
+test output, issues, or commits. `.gitignore` does not protect a file already tracked
+by Git; verify the local configuration stays untracked before pushing.
 
 ```sh
 .venv/bin/python -m pytest tests/test_single_note.py -q
@@ -130,6 +136,11 @@ Run the focused tests with:
 ```sh
 .venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py -q
 ```
+
+The latest focused run passed 92 tests. The wrapper has also been called from
+Codex: the allowed dummy returned the closed privacy-gate error, and an excluded
+note returned a policy denial. No note content was fetched in either check.
+These results verify transport and access controls, not successful redaction.
 
 The optional runtime is pinned separately in `requirements-live.txt`; run its
 install command again after `uv sync`, which removes packages outside `uv.lock`.
