@@ -27,18 +27,26 @@ Changes needed before claiming its definition of done:
 ## Implemented prototype decisions
 
 - A local stdio MCP server exposes only `read_safe_note` and `search_safe_notes`.
-  It has been registered with Codex and called successfully, returning static
-  blocking errors. Production content processing remains disabled.
-- The test policy allows one locally configured dummy note. An explicit block
-  list takes precedence over that allowance, for both reads and searches.
+  Live reads and keyword searches are implemented. The names refer to access
+  controls; they do not promise PII redaction.
+- Access defaults to one locally configured note. Explicit `denylist` mode allows
+  all other IDs while enforcing the private block list. Denial always wins.
+- Content defaults to `blocked`. Explicit local `unredacted` opt-in permits
+  original text from allowed notes to reach the assistant. This user-authorized
+  mode is separate from the unfinished privacy filter and makes no redaction claim.
+- Direct IDs are authorized before network access and checked against response
+  IDs. Upstream search rows are filtered locally before projecting permitted
+  titles/snippets. Blocked metadata can reach the local process; it is discarded.
+- Policy is reloaded on each call. A policy change while a request is in flight
+  prevents returning its result. The configured modes cannot be tool arguments.
 - Actual note IDs, account links, and the block list are private local data in
   the ignored `.everwrap-local.json`. Committed fixtures contain synthetic IDs;
   the committed example has an empty block list. Never publish the local policy.
 - OAuth setup and tool-schema discovery succeeded with read-only consent. This
   does not authorize arbitrary note access or prove that filtering is ready.
-- The live note adapter, English and Turkish privacy validation, exact-output
-  review, and OS-enforced runtime isolation remain unfinished. The wrapper
-  therefore denies content access before any upstream note fetch.
+- English and Turkish privacy validation, exact-output review, and OS-enforced
+  runtime isolation remain unfinished. They are still requirements for a future
+  redacted-output mode; enabling unredacted access does not satisfy them.
 
 Sources: https://microsoft.github.io/presidio/ and
 https://microsoft.github.io/presidio/installation/

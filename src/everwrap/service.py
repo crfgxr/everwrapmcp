@@ -1,7 +1,7 @@
 """Transport-independent prototype; default output gate is closed.
 
-An upstream adapter must perform only the exact fetch requested here, with no
-search, links, attachments, or fallback fetches. No live adapter exists yet.
+This legacy single-note filtering service is exercised with synthetic backends.
+The explicitly opted-in live unredacted service is implemented in live.py.
 Injected sanitizers are trusted local code, never tool arguments. Mock sanitizers
 in tests are not evidence of PII coverage.
 """

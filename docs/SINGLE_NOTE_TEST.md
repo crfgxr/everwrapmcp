@@ -1,77 +1,84 @@
-# Single-note test boundary
-
-Only one dummy note is authorized for the first live test. Its identifier belongs
-in the ignored `.everwrap-local.json`, not in source, fixtures, commits, or logs.
-The first UUID following the shard in the supplied internal link is used as the
-candidate note ID. No other identifier from the link is tried as a fallback.
-This interpretation has not been verified by a live fetch.
-
-Reference: https://dev.evernote.com/legacy/doc/articles/note_links
+# Note access tests
 
 ## Private local policy
 
-The local file contains `allowed_note_id` and an optional `blocked_note_ids` list
-of up to 16 UUIDs. Explicit denial wins even if a note is also the allowed note.
-Every other note is denied by default. Both reads and searches enforce this
-policy before fetching content. Restart the MCP connection after policy changes.
+The original live test allowed only one synthetic dummy note. Its UUID was derived
+from the first UUID following the shard in its Evernote internal link. A live read
+of that dummy now verified the direct-fetch parser. Other UUIDs in a link are not
+tried as fallbacks.
 
-The actual block list and note links are private. Keep them out of Markdown,
-fixtures, issues, screenshots, commits, and diagnostic output. The committed
-`single-note.example.json` contains a placeholder and an empty block list only.
-Before pushing, verify `.everwrap-local.json` is ignored and untracked; an ignore
-rule cannot remove a file or identifier already committed to Git history.
+Reference: https://dev.evernote.com/legacy/doc/articles/note_links
+
+The wrapper now supports two explicit access modes:
+
+- `single_note`: only the locally configured `allowed_note_id` is permitted.
+- `denylist`: all note IDs are permitted except `blocked_note_ids`.
+
+Denial takes precedence in both modes. The block list allows up to 16 UUIDs and
+remains in the ignored `.everwrap-local.json`. Actual IDs and note links must not
+appear in fixtures, Markdown, logs, screenshots, issues, or commits. The committed
+example contains a placeholder and an empty block list only.
+
+Content is independently controlled by `content_mode`: `blocked` by default,
+`unredacted` only with explicit local opt-in. The latter returns original text from
+permitted notes without PII filtering. The latest local configuration change was
+explicitly authorized by the user; committed defaults remain closed.
 
 ## Verified with synthetic fixtures
 
-- Unauthorized, wildcard, malformed, and multiple IDs cause zero backend calls.
-- Missing or malformed policy fails closed; duplicate keys and overrides fail.
-- Explicit blocks override the allowed ID in both read and search paths.
-- A missing sanitizer causes zero backend calls, including for the allowed ID.
-- With a test sanitizer, search fetches only the pinned ID, never upstream search.
-- Arguments cannot override the policy or add notebook scope.
-- Wrong upstream identity, malformed fields, and oversized content are blocked.
-- Title, body, and snippet flow through the injected sanitizer.
-- Backend and sanitizer exceptions are replaced with static, unchained errors.
-- Only explicitly constructed output fields are returned.
-- MCP exposes only the two wrapper tools and no resources or prompts.
+The latest focused suite passed 135 tests across policy/service, OAuth setup,
+MCP boundaries, live-adapter argument mapping, and unredacted-mode handling:
 
-The latest focused run passed 92 tests across policy/service, OAuth setup, and
-MCP transport checks. The fake sanitizer only replaces a synthetic canary.
-It is not a production redactor. The six PII/secret benchmark failures remain
-blockers. Validate contextual names, dates, birthdays, and addresses independently
-in both English and Turkish before enabling any production content output.
+- Malformed and blocked direct IDs cause zero backend calls.
+- Explicit denial overrides an allow entry; UUID case cannot bypass the block.
+- Missing, malformed, unsupported, or duplicate-key policy fails closed.
+- Default blocked content mode prevents network access, including permitted IDs.
+- Single-note mode never performs upstream account search.
+- Denylist search discards blocked rows before projecting any title or snippet.
+- Search pagination and result limits are bounded; raw totals are not forwarded.
+- Tool arguments cannot override policy, output mode, or upstream method names.
+- Reads reject mismatched upstream identity, malformed fields, and oversized text.
+- Unselected upstream fields, error text, and resources do not reach MCP output.
+- Policy reload takes effect on the next call; a change during a call blocks output.
+- Only the two wrapper tools are exposed, without prompts or resources.
 
-## Connection and callable-tool status
+Legacy sanitizer tests use a synthetic canary replacement, not a production
+redactor. No sanitization is claimed for unredacted mode. English and Turkish
+contextual names, dates, birthdays, and addresses still require independent
+privacy validation; six baseline release-gate failures remain unresolved.
 
-MCP SDK 2.2.0 and keyring 25.7.0 are installed locally. `everwrap.connect`
-completed read-only OAuth and schema discovery, with Keychain storage and a
-loopback callback. It does not read notes. The official read tool accepts
-`get_note` with a `noteId` argument; it advertises no output schema, so the actual
-response structure still needs local validation before an adapter is implemented.
+## Connection and live checks
 
-The direct Codex Evernote MCP entry was removed. The local `everwrap` server is
-registered, and its `read_safe_note` tool has been called from Codex:
+Read-only OAuth completed, with Keychain storage and a loopback callback.
+The official `get_note` accepts `noteId` and returns note fields in structured
+content; the parser selects only a matching `id`, `title`, and ENML `content`.
+The official `search_notes` returns structured `hits`, checked by `noteId` before
+projecting permitted titles, snippets, and timestamps. Upstream schemas were
+inspected rather than guessed. API reference: https://dev.evernote.com/mcp/tools
 
-- Allowed dummy: `Content blocked: privacy processing is not enabled or could not safely complete.`
-- Excluded note: `Request denied by the local single-note policy.`
+Initial Codex tool calls confirmed that the closed gate and single-note restriction
+blocked output. After explicit authorization for denylist/unredacted mode, a fresh
+stdio process verified:
 
-A fresh stdio process also confirmed policy denial after the local block list
-was saved. These checks prove tool availability and blocking, not successful
-note retrieval or filtering. No Evernote notes have been fetched by this project.
-The wrapper cannot establish whether another application has direct access.
+- The blocked ID returns `Request denied by the local note access policy.`
+- The permitted dummy is fetched and returned with `content_mode: "unredacted"`.
+- A keyword search succeeds and its returned rows exclude blocked IDs.
 
-## Remaining live-test prerequisites
+Live verification reports contain status and field names only, not note text or
+private identifiers. The direct Evernote connector stays removed. An existing
+Codex process must reload the updated MCP server before using its new behavior.
 
-1. Implement the official direct-fetch adapter and validate its actual response
-   locally. Do not invent field names or expose raw responses to the assistant.
-2. Test the adapter's outbound method and ID allowlist against fake MCP responses.
-3. Validate local English and Turkish privacy processing, deterministic secret
-   blocking, and exact outbound review. Keep unvalidated output out of the cloud.
-4. Fetch only the configured dummy for the authorized filtering test, then measure
-   leaks and retained useful text. Never fetch another note to demonstrate denial.
-5. Do not resolve links, retrieve attachments, search the account, or try fallback IDs.
+## Boundaries and remaining work
 
-The current server has no live backend or enabled sanitizer. This code is a
-prototype application-level restriction, not an OS sandbox. It cannot constrain
-an agent with write access to the code or separate access to backend credentials.
-Runtime isolation remains a separate deployment task.
+The wrapper never requests a blocked note body. Upstream search can return blocked
+metadata/snippets to the local process, where the whole row is discarded before
+cloud output. This does not restrict the upstream OAuth grant itself or prevent
+a separate client from accessing the same account.
+
+There is no write access, attachment retrieval, link following, semantic search,
+or alternate-ID fallback. Searches scan up to 100 hits and return at most 10
+permitted rows. Relative-date queries use UTC. Very large notes fail output bounds.
+
+Production PII filtering, exact-output review, and OS isolation remain unfinished.
+This application-level policy cannot constrain an agent that can edit its code or
+configuration, or access backend credentials independently.

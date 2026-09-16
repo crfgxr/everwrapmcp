@@ -1,4 +1,6 @@
 {
   "allowed_note_id": "REPLACE_WITH_YOUR_DUMMY_NOTE_UUID",
-  "blocked_note_ids": []
+  "blocked_note_ids": [],
+  "access_mode": "single_note",
+  "content_mode": "blocked"
 }

@@ -1,7 +1,8 @@
 # Baseline result — 2026-09-17
 
-**Decision: keep note-content access disabled.** Read-only OAuth and schema
-discovery are verified; no note content has been fetched.
+**Privacy-filter decision: do not enable automatic redacted output.** Read-only
+OAuth and live retrieval are now verified separately. The user explicitly enabled
+unredacted output for locally permitted notes; this is not a successful filter test.
 
 Presidio 2.2.364, spaCy 3.8.16, en_core_web_lg 3.8.0, Python 3.12.13.
 Exact package resolution is in uv.lock.
@@ -28,17 +29,26 @@ The passing English person example does not establish English privacy coverage.
 
 ## Integration checks — 2026-09-17
 
-The latest focused suite passed 92 tests covering single-note authorization,
-explicit block-list precedence, OAuth setup safeguards, and the MCP boundary.
+The latest focused suite passed 135 tests covering single-note and denylist
+authorization, explicit block-list precedence, OAuth setup safeguards, upstream
+argument mapping, response validation, policy reload, and the MCP boundary.
 These tests use synthetic fixtures and do not validate production redaction.
 
 Read-only OAuth completed and the official `get_note` input schema was inspected.
 The local wrapper was registered with Codex. Calls through its exposed MCP tool
 returned a privacy-gate error for the allowed dummy and a policy denial for an
 excluded note. A fresh stdio process also verified the configured denial.
-Neither check fetched note content.
+Those initial checks fetched no note content.
 
-The live fetch adapter, production sanitizer, exact-output review, and OS
-isolation remain unimplemented. Static error and canary tests cover selected
+After explicit opt-in to denylist access and unredacted output, a fresh stdio
+server verified a live read of the permitted synthetic dummy, a denial of the
+blocked ID, and a keyword search returning a permitted result. The dummy response
+structure was inspected locally to implement the parser. Raw content and private
+note identifiers were not copied into code or reports. Search rows are filtered
+locally before output; upstream search can supply blocked metadata to the local
+wrapper, but the wrapper never requests a blocked note body.
+
+The production sanitizer, exact-output review, and OS isolation remain
+unimplemented. Static error and canary tests cover selected
 leakage paths, not a complete logging-isolation guarantee. The six baseline
 release-gate failures remain unresolved; the focused suite does not replace them.

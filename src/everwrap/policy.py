@@ -1,4 +1,4 @@
-"""Single-note test policy. Never accepts policy overrides in tool arguments."""
+"""Local access policy. Never accepts policy overrides in tool arguments."""
 
 import json
 import re
@@ -27,12 +27,17 @@ def canonical_note_id(value: object) -> str:
 
 @dataclass(frozen=True, slots=True)
 class SingleNotePolicy:
-    allowed_note_id: str = field(repr=False)
+    allowed_note_id: str | None = field(default=None, repr=False)
     blocked_note_ids: frozenset[str] = field(default_factory=frozenset, repr=False)
+    access_mode: str = "single_note"
+    content_mode: str = "blocked"
 
     def __post_init__(self):
         try:
-            normalized = canonical_note_id(self.allowed_note_id)
+            if self.access_mode not in ("single_note", "denylist") or self.content_mode not in ("blocked", "unredacted"):
+                raise AccessDenied()
+            normalized = (None if self.allowed_note_id is None and self.access_mode == "denylist"
+                          else canonical_note_id(self.allowed_note_id))
             if not isinstance(self.blocked_note_ids, frozenset) or len(self.blocked_note_ids) > 16:
                 raise AccessDenied()
             blocked = frozenset(canonical_note_id(value) for value in self.blocked_note_ids)
@@ -59,18 +64,20 @@ class SingleNotePolicy:
                 return result
 
             data = json.loads(raw, object_pairs_hook=unique_fields)
-            if (not isinstance(data, dict) or "allowed_note_id" not in data
-                    or not set(data) <= {"allowed_note_id", "blocked_note_ids"}):
+            if (not isinstance(data, dict)
+                    or not set(data) <= {"allowed_note_id", "blocked_note_ids", "access_mode", "content_mode"}):
                 raise ValueError
             blocked = data.get("blocked_note_ids", [])
             if type(blocked) is not list or len(blocked) > 16:
                 raise ValueError
-            return cls(data["allowed_note_id"], frozenset(blocked))
+            return cls(data.get("allowed_note_id"), frozenset(blocked),
+                       data.get("access_mode", "single_note"), data.get("content_mode", "blocked"))
         except (OSError, ValueError, TypeError, InvalidPolicy):
             raise InvalidPolicy("Single-note policy is unavailable or invalid.") from None
 
     def authorize(self, note_id: object) -> str:
         normalized = canonical_note_id(note_id)
-        if normalized in self.blocked_note_ids or normalized != self.allowed_note_id:
+        if (normalized in self.blocked_note_ids
+                or (self.access_mode == "single_note" and normalized != self.allowed_note_id)):
             raise AccessDenied("Note access denied.")
         return normalized
