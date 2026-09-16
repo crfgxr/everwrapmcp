@@ -33,7 +33,7 @@ small corpus would not prove general privacy.
 
 ## Gates before integration
 
-- Validate Turkish NLP and contextual names, dates, birthdays, addresses.
+- Validate English and Turkish NLP, including contextual names, dates, birthdays, and addresses in both languages.
 - Add deterministic secret blocking, including encoded/obfuscated variants.
 - Test unauthorized direct IDs, untrusted search results, membership changes,
   malformed responses, sanitizer errors, metadata leakage, and log leakage.
