@@ -2,7 +2,8 @@
 
 A proposed local privacy boundary between Evernote and cloud assistants.
 
-**Status: feasibility experiments only. No MCP server or Evernote connection exists yet.**
+**Status: filtering experiments and a tested single-note service prototype.
+No MCP server or live Evernote connection exists yet.**
 
 The architecture should enforce notebook access in code, construct minimal responses,
 filter titles and snippets as well as bodies, and fail closed on processing errors.
@@ -40,3 +41,31 @@ small corpus would not prove general privacy.
   remove direct backend access only after reviewing exact configuration changes.
 
 Do not use this prototype to protect real personal data.
+
+## Single-note integration test preparation
+
+The service prototype permits exactly one locally configured UUID. Both reads and
+searches are restricted to that note; searches filter its sanitized text locally
+and never invoke an upstream account-wide search. Invalid or unauthorized IDs are
+rejected before backend access. The service also rejects unexpected response IDs.
+
+Copy `single-note.example.json` to `.everwrap-local.json` and replace the placeholder
+with the dummy note's UUID. The local file is Git-ignored; never commit account or
+note identifiers. `SingleNotePolicy.from_file` validates an explicitly supplied
+path. It does not automatically load this file or alter any app's configuration.
+
+```sh
+.venv/bin/python -m pytest tests/test_single_note.py -q
+```
+
+These tests use fake backend responses and a canary-replacement test double. They
+verify access controls and response handling, **not PII-detection quality**. Without
+an explicitly supplied sanitizer the service blocks even the allowed note before
+fetching it. The baseline privacy failures remain unresolved.
+
+The next step is a local adapter to the official Evernote MCP, authenticated with
+OAuth in the wrapper process. It must perform only the exact requested note fetch,
+without link following, attachment downloads, broad searches, or fallback IDs.
+The future MCP server must expose only the two safe methods, never the adapter.
+This local policy is not an Evernote account permission and cannot restrict a
+separate direct Evernote connector. No global configuration has been changed.
