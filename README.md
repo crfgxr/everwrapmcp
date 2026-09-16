@@ -2,9 +2,11 @@
 
 A proposed local privacy boundary between Evernote and cloud assistants.
 
-**Status: filtering experiments, a tested single-note service prototype, and a
-macOS OAuth connection setup command. No MCP server is exposed to Codex yet;
-the live connection and note-fetch adapter are not verified.**
+**Status: a local stdio MCP server exposes `read_safe_note` and `search_safe_notes`.
+Content access deliberately fails closed: the privacy filter has known failures
+and the live note-fetch adapter is not implemented. The macOS OAuth setup probe
+has connected successfully and inspected the official read-tool schema without
+reading notes.**
 
 The architecture should enforce notebook access in code, construct minimal responses,
 filter titles and snippets as well as bodies, and fail closed on processing errors.
@@ -53,7 +55,7 @@ rejected before backend access. The service also rejects unexpected response IDs
 Copy `single-note.example.json` to `.everwrap-local.json` and replace the placeholder
 with the dummy note's UUID. The local file is Git-ignored; never commit account or
 note identifiers. `SingleNotePolicy.from_file` validates an explicitly supplied
-path. It does not automatically load this file or alter any app's configuration.
+path. The MCP server loads this file from its repository root at startup.
 
 ```sh
 .venv/bin/python -m pytest tests/test_single_note.py -q
@@ -67,9 +69,30 @@ fetching it. The baseline privacy failures remain unresolved.
 The next step is a local adapter to the official Evernote MCP, authenticated with
 OAuth in the wrapper process. It must perform only the exact requested note fetch,
 without link following, attachment downloads, broad searches, or fallback IDs.
-The future MCP server must expose only the two safe methods, never the adapter.
+The MCP server exposes only the two safe methods, never the adapter.
 This local policy is not an Evernote account permission and cannot restrict a
-separate direct Evernote connector. No global configuration has been changed.
+separate direct Evernote connector.
+
+## Register the local wrapper with Codex
+
+After installing the runtime below and configuring the dummy-note UUID, run from
+the repository root:
+
+```sh
+codex mcp add everwrap --env "PYTHONPATH=$PWD/src" -- "$PWD/.venv/bin/python" -m everwrap.server
+```
+
+This changes the global Codex MCP configuration. Refresh the MCP connection or
+restart Codex to load it into an existing session. Keep any direct Evernote MCP
+connector removed if the wrapper is intended to be the only exposed note tool.
+
+The server accepts strict tool arguments, returns static errors, and advertises
+no resource or prompt access. Its production service currently has **no enabled
+sanitizer or live backend**: calls cannot retrieve any note, including the allowed
+dummy. Registration and a successful MCP handshake do not mean privacy filtering
+or real note reads are ready. The existing six baseline release-gate failures
+remain unresolved. View-only OAuth prevents writes under that grant; it does not
+provide redaction or limit the grant to the dummy note.
 
 ## Connect the official Evernote MCP (macOS setup probe)
 
@@ -99,7 +122,7 @@ for manual use on this Mac. Never share the callback URL containing the code.
 Run the focused tests with:
 
 ```sh
-.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py -q
+.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py -q
 ```
 
 The optional runtime is pinned separately in `requirements-live.txt`; run its

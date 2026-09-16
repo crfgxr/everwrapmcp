@@ -1,4 +1,4 @@
-# Optional live OAuth probe, installed after `uv sync`.
+# MCP server and optional live OAuth probe, installed after `uv sync`.
 # Kept separate while the offline universal lock cannot resolve Windows wheels.
 mcp==2.2.0
 keyring==25.7.0
