@@ -1,0 +1,84 @@
+{
+  "configuration": "Presidio defaults + en_core_web_lg; Turkish evaluated as challenge input, not claimed supported",
+  "synthetic_only": true,
+  "passed": 4,
+  "total": 10,
+  "production_ready": false,
+  "results": [
+    {
+      "case": "english_person",
+      "passed": true,
+      "entities": [
+        "PERSON"
+      ],
+      "output": "Talk to <PERSON> about the chatbot."
+    },
+    {
+      "case": "email",
+      "passed": true,
+      "entities": [
+        "EMAIL_ADDRESS",
+        "URL"
+      ],
+      "output": "Contact <EMAIL_ADDRESS> about the chatbot."
+    },
+    {
+      "case": "turkish_phone",
+      "passed": true,
+      "entities": [
+        "DATE_TIME",
+        "NRP",
+        "PHONE_NUMBER"
+      ],
+      "output": "<NRP>: <PHONE_NUMBER>"
+    },
+    {
+      "case": "turkish_person",
+      "passed": false,
+      "entities": [
+        "ORGANIZATION",
+        "PERSON"
+      ],
+      "output": "<PERSON> Yılmaz ile chatbot <ORGANIZATION>."
+    },
+    {
+      "case": "turkish_birthday",
+      "passed": false,
+      "entities": [
+        "DATE_TIME",
+        "LOCATION"
+      ],
+      "output": "<LOCATION> günüm 14 Mart <DATE_TIME>."
+    },
+    {
+      "case": "openai_key",
+      "passed": false,
+      "entities": [],
+      "output": "OPENAI_API_KEY=sk-test-secret-value"
+    },
+    {
+      "case": "password",
+      "passed": false,
+      "entities": [],
+      "output": "password=synthetic-password-742"
+    },
+    {
+      "case": "bearer",
+      "passed": false,
+      "entities": [],
+      "output": "Authorization: Bearer synthetic-token-742"
+    },
+    {
+      "case": "connection_string",
+      "passed": false,
+      "entities": [],
+      "output": "postgresql://demo:synthetic-pass@localhost/demo"
+    },
+    {
+      "case": "useful_text",
+      "passed": true,
+      "entities": [],
+      "output": "The chatbot architecture should use an event-driven approach."
+    }
+  ]
+}
