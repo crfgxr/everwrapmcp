@@ -28,12 +28,18 @@ Changes needed before claiming its definition of done:
 
 - A local stdio MCP server exposes only `read_safe_note` and `search_safe_notes`.
   Live reads and keyword searches are implemented. The names refer to access
-  controls; they do not promise PII redaction.
+  controls; complete PII removal is not promised by their names.
 - Access defaults to one locally configured note. Explicit `denylist` mode allows
   all other IDs while enforcing the private block list. Denial always wins.
 - Content defaults to `blocked`. Explicit local `unredacted` opt-in permits
-  original text from allowed notes to reach the assistant. This user-authorized
-  mode is separate from the unfinished privacy filter and makes no redaction claim.
+  original text from allowed notes to reach the assistant. Local `redacted` mode
+  uses Presidio Analyzer and Anonymizer with the installed English NLP model plus
+  bilingual patterns and credential recognizers. This is best-effort detection,
+  not a full Turkish NER model or a guarantee that no PII remains.
+- Redaction applies to titles, bodies, and search snippets. ENML is flattened
+  without executing markup or fetching resources. Raw markup attributes and
+  search timestamps are omitted. A redactor/model error blocks the entire call;
+  no automatic switch to unredacted mode exists.
 - Direct IDs are authorized before network access and checked against response
   IDs. Upstream search rows are filtered locally before projecting permitted
   titles/snippets. Blocked metadata can reach the local process; it is discarded.
@@ -44,9 +50,9 @@ Changes needed before claiming its definition of done:
   the committed example has an empty block list. Never publish the local policy.
 - OAuth setup and tool-schema discovery succeeded with read-only consent. This
   does not authorize arbitrary note access or prove that filtering is ready.
-- English and Turkish privacy validation, exact-output review, and OS-enforced
-  runtime isolation remain unfinished. They are still requirements for a future
-  redacted-output mode; enabling unredacted access does not satisfy them.
+- Broader English and Turkish privacy validation, exact-output review, and
+  OS-enforced runtime isolation remain unfinished. The requested automatic
+  redaction mode is enabled without claiming those stronger guarantees.
 
 Sources: https://microsoft.github.io/presidio/ and
 https://microsoft.github.io/presidio/installation/

@@ -1,12 +1,13 @@
 # EverWrap
 
-A local access-control wrapper for Evernote MCP, with ongoing privacy-filtering
-experiments. Exposes only `read_safe_note` and `search_safe_notes` over stdio.
+A local access-control wrapper for Evernote MCP with optional local Presidio
+redaction. Exposes only `read_safe_note` and `search_safe_notes` over stdio.
 
 **Status: live read-only OAuth, note reads, and keyword searches work.** Content
-is disabled by default. An explicit local opt-in enables **unredacted** text from
-permitted notes. The tool names refer to access checks, not guaranteed PII removal.
-English and Turkish privacy filtering is not ready; six baseline checks still fail.
+is disabled by default. Local configuration can enable **redacted** or **unredacted**
+output from permitted notes. Presidio masks detected sensitive spans, but neither
+mode nor the tool names guarantee complete PII removal. English statistical NLP
+and supplemental English/Turkish patterns are implemented; full Turkish NER is not.
 
 ## Access and content modes
 
@@ -17,14 +18,16 @@ Policy lives only in the ignored `.everwrap-local.json`:
 - `blocked_note_ids` holds up to 16 UUIDs. Explicit denial always wins, including
   when a blocked ID is also the single allowed ID. UUIDs are case-insensitive.
 - `content_mode: "blocked"` is the default and stops content calls before network
-  access. `content_mode: "unredacted"` explicitly permits original note text,
+  access. `content_mode: "redacted"` runs local Presidio on titles, bodies, and
+  snippets, replacing detected spans with placeholders. Errors block output;
+  there is no raw-text fallback. `content_mode: "unredacted"` permits original text,
   titles, and search snippets to reach the assistant without PII redaction.
 
 Copy `single-note.example.json` to `.everwrap-local.json` and replace its placeholder
 with a test-note UUID for the default single-note setup. To use denylist access,
 edit the local file to set that access mode and populate its private block list;
 `allowed_note_id` is optional and unused in denylist mode. Enabling denylist access
-does not by itself enable content: unredacted output requires its separate opt-in.
+does not by itself enable content: select a content mode separately.
 
 The server reloads policy on every call and discards results if policy changes
 while a request is running. Missing, malformed, or unsupported configuration fails
@@ -45,6 +48,12 @@ tasks, notebook metadata, or raw tool responses are forwarded. Links and attachm
 are not followed. No write tools, semantic search, resources, or prompts are exposed.
 Search uses Evernote keyword/search grammar, scans at most the first 100 hits,
 returns at most 10 permitted rows, and uses UTC for relative date operators.
+
+Redacted reads return plain text with placeholders such as `[PERSON]`, `[SECRET]`,
+and `[REDACTED]`. ENML attributes, links, comments, and hidden payloads are omitted;
+visible text is normalized before detection. Search titles/snippets also pass
+through redaction, and search timestamps are omitted in this mode. Routing IDs
+remain available for authorized follow-up reads. See `docs/REDACTION.md` for limits.
 
 A development folder or same-user Keychain is not an OS-enforced security boundary.
 This wrapper cannot constrain a separate direct connector or an agent with access
@@ -98,14 +107,16 @@ wrapper is intended to be the only exposed note interface.
 ## Verification
 
 ```sh
-.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py tests/test_live.py -q
+.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py tests/test_live.py tests/test_redaction.py tests/test_benchmark.py -q
 ```
 
-The latest focused run passed 135 tests. Live checks through a fresh stdio server
+The latest focused run passed 183 tests. Live checks through a fresh stdio server
 confirmed a permitted dummy read, a policy denial for a blocked ID, and a keyword
-search returning a permitted hit. Live note text and private identifiers were not
-copied into the repository or test reports. These results verify access controls
-and transport, not successful redaction.
+search returning a permitted hit. The latest redacted dummy read returned plain
+text with 27 masking placeholders. Real-Presidio integration tests cover titles,
+body text, snippets, metadata omission, split HTML text, and failure handling.
+Live note text and private identifiers were not copied into the repository or
+reports. This proves selected behavior, not complete detection on arbitrary notes.
 
 The runtime is pinned separately in `requirements-live.txt`. Reinstall it after
 `uv sync`, which removes packages outside `uv.lock`. This split is temporary;
@@ -127,14 +138,26 @@ contains synthetic data only. Four of ten cases pass; six release-gate tests
 intentionally fail on known leaks. Re-run the experiment after changing dependencies
 or cases. Passing a small corpus would not prove general privacy.
 
-Before enabling a redacted-output mode:
+The original stock-baseline release tests still report six known failures. They
+remain as historical evidence and are not silently marked passing. The new
+redactor independently removes the expected sensitive values in all ten original
+cases. Its expanded corpus passes **24 of 26** checks: two harmless-text controls
+are over-masked. Run the actual redactor's synthetic report with:
+
+```sh
+PYTHONPATH=src .venv/bin/python -m experiments.redaction
+```
+
+`docs/redaction-results.json` records the results, including false positives.
+Remaining work for stronger privacy:
 
 - Validate contextual names, dates, birthdays, and addresses independently in
   both English and Turkish, across titles, snippets, and bodies.
-- Add deterministic secret handling, including encoded and obfuscated forms.
+- Extend the implemented credential patterns to more encoded and obfuscated forms.
 - Test metadata leakage, malformed responses, and sanitizer failures.
 - Add local review of exact outbound text and enforce processing/output bounds.
 - Deploy policy and credentials behind an OS-enforced runtime boundary.
 
-Unredacted mode is an explicit alternative to that unfinished filter, not evidence
-that these gates have been met. See `docs/RESULTS.md` and `docs/SINGLE_NOTE_TEST.md`.
+Redacted mode is best-effort automatic masking without an exact-output approval
+step. Unredacted mode intentionally skips masking. Neither mode establishes the
+stronger guarantees above. See `docs/RESULTS.md` and `docs/SINGLE_NOTE_TEST.md`.

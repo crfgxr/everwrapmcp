@@ -41,13 +41,13 @@ class OfficialBackend:
 
     async def get_note(self, note_id):
         authorized = self.policy.authorize(note_id)  # Before transport/auth/network.
-        if self.policy.content_mode != "unredacted":
+        if self.policy.content_mode not in ("unredacted", "redacted"):
             raise ProcessingBlocked("Content output is not enabled.")
         async with self.client_factory() as client:
             return await client.call_tool("get_note", {"noteId": authorized})
 
     async def search_notes(self, query, sort, start_index, max_results):
-        if self.policy.access_mode != "denylist" or self.policy.content_mode != "unredacted":
+        if self.policy.access_mode != "denylist" or self.policy.content_mode not in ("unredacted", "redacted"):
             raise ProcessingBlocked("Account search is not enabled.")
         async with self.client_factory() as client:
             return await client.call_tool("search_notes", {

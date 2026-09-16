@@ -1,8 +1,8 @@
 # Baseline result — 2026-09-17
 
-**Privacy-filter decision: do not enable automatic redacted output.** Read-only
-OAuth and live retrieval are now verified separately. The user explicitly enabled
-unredacted output for locally permitted notes; this is not a successful filter test.
+**Stock-baseline decision: unsuitable for reliable privacy protection.** The
+original results below remain unchanged. A separate best-effort Presidio mode
+with additional patterns is now implemented and enabled at the user's request.
 
 Presidio 2.2.364, spaCy 3.8.16, en_core_web_lg 3.8.0, Python 3.12.13.
 Exact package resolution is in uv.lock.
@@ -29,10 +29,11 @@ The passing English person example does not establish English privacy coverage.
 
 ## Integration checks — 2026-09-17
 
-The latest focused suite passed 135 tests covering single-note and denylist
+The latest focused suite passed 183 tests covering single-note and denylist
 authorization, explicit block-list precedence, OAuth setup safeguards, upstream
 argument mapping, response validation, policy reload, and the MCP boundary.
-These tests use synthetic fixtures and do not validate production redaction.
+These tests use synthetic fixtures. Real-Presidio tests now validate selected
+masking behavior and failure paths, without proving general detection coverage.
 
 Read-only OAuth completed and the official `get_note` input schema was inspected.
 The local wrapper was registered with Codex. Calls through its exposed MCP tool
@@ -48,7 +49,27 @@ note identifiers were not copied into code or reports. Search rows are filtered
 locally before output; upstream search can supply blocked metadata to the local
 wrapper, but the wrapper never requests a blocked note body.
 
-The production sanitizer, exact-output review, and OS isolation remain
-unimplemented. Static error and canary tests cover selected
-leakage paths, not a complete logging-isolation guarantee. The six baseline
-release-gate failures remain unresolved; the focused suite does not replace them.
+## Presidio redaction — 2026-09-17
+
+The new local redactor uses Presidio Analyzer and Anonymizer, the installed
+`en_core_web_lg` model, conservative English/Turkish patterns, and credential
+recognizers. It normalizes text and masks the union of overlapping detected spans.
+ENML becomes plain text; titles and search snippets are also processed. Redacted
+search omits date metadata. Processing failures never return raw note text.
+
+The expanded synthetic report is `redaction-results.json`: **24/26** corpus checks
+passed. All targeted sensitive values were removed, including the values missed
+in the six original baseline cases. Two utility controls fail: the model masks
+`asyncio` as a person and a harmless Turkish word as an organization. Some
+conservative patterns can remove extra context. These limitations are retained
+in the report rather than hidden or described as privacy guarantees.
+
+A fresh stdio server denied the blocked ID and returned the permitted dummy in
+redacted plain text with 27 masking placeholders. Only placeholder counts/types
+were printed during this check, not live note text or identifiers.
+
+The original stock-baseline test command still reports **6 failed, 4 passed**;
+the original report was not overwritten. Stronger Turkish statistical NER,
+broader adversarial coverage, exact-output review, and OS isolation remain work
+items. Passing these fixtures does not establish that every name, birthday,
+address, secret, or contextual identifier is detected.

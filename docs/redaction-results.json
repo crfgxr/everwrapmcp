@@ -1,0 +1,152 @@
+{
+  "configuration": "Local Presidio + en_core_web_lg + bilingual patterns and credential recognizers",
+  "synthetic_only": true,
+  "guarantees_complete_detection": false,
+  "passed": 24,
+  "total": 26,
+  "results": [
+    {
+      "case": "english_person",
+      "passed": true,
+      "output": "Talk to [PERSON] about the chatbot."
+    },
+    {
+      "case": "email",
+      "passed": true,
+      "output": "Contact [REDACTED] about the chatbot."
+    },
+    {
+      "case": "turkish_phone",
+      "passed": true,
+      "output": "[NRP]: [REDACTED]"
+    },
+    {
+      "case": "turkish_person",
+      "passed": true,
+      "output": "[PERSON] ile chatbot [ORGANIZATION]."
+    },
+    {
+      "case": "turkish_birthday",
+      "passed": true,
+      "output": "[REDACTED]"
+    },
+    {
+      "case": "openai_key",
+      "passed": true,
+      "output": "[SECRET]"
+    },
+    {
+      "case": "password",
+      "passed": true,
+      "output": "[SECRET]"
+    },
+    {
+      "case": "bearer",
+      "passed": true,
+      "output": "Authorization: [SECRET]"
+    },
+    {
+      "case": "connection_string",
+      "passed": true,
+      "output": "[SECRET]"
+    },
+    {
+      "case": "useful_text",
+      "passed": true,
+      "output": "The chatbot architecture should use an event-driven approach."
+    },
+    {
+      "case": "english_context_name",
+      "passed": true,
+      "output": "[PERSON]. Build the chatbot."
+    },
+    {
+      "case": "turkish_context_name",
+      "passed": true,
+      "output": "[PERSON]. [PERSON]."
+    },
+    {
+      "case": "unicode_full_name",
+      "passed": true,
+      "output": "[PERSON] ile görüşme yapıldı."
+    },
+    {
+      "case": "english_birthday",
+      "passed": true,
+      "output": "[DATE_TIME]\nBuild the chatbot."
+    },
+    {
+      "case": "turkish_birthday_new",
+      "passed": true,
+      "output": "[REDACTED]\nchatbot hazır."
+    },
+    {
+      "case": "numeric_date",
+      "passed": true,
+      "output": "Appointment [DATE_TIME]. Build the chatbot."
+    },
+    {
+      "case": "english_address",
+      "passed": true,
+      "output": "[REDACTED]\nBuild the chatbot."
+    },
+    {
+      "case": "turkish_address",
+      "passed": true,
+      "output": "[REDACTED]\nchatbot hazır."
+    },
+    {
+      "case": "turkish_password",
+      "passed": true,
+      "output": "[SECRET]\nchatbot hazır."
+    },
+    {
+      "case": "quoted_secret",
+      "passed": true,
+      "output": "[SECRET]\nBuild the chatbot."
+    },
+    {
+      "case": "zero_width_secret",
+      "passed": true,
+      "output": "[SECRET]"
+    },
+    {
+      "case": "html_entity_email",
+      "passed": true,
+      "output": "Write to [REDACTED] about the chatbot."
+    },
+    {
+      "case": "private_key",
+      "passed": true,
+      "output": "[SECRET]"
+    },
+    {
+      "case": "basic_auth",
+      "passed": true,
+      "output": "Authorization: [SECRET]"
+    },
+    {
+      "case": "turkish_utility",
+      "passed": false,
+      "output": "chatbot [ORGANIZATION] olay tabanlı mimari kullan."
+    },
+    {
+      "case": "code_utility",
+      "passed": false,
+      "output": "Use [PERSON] to process messages and retry failed requests."
+    }
+  ],
+  "exploratory_challenges": [
+    {
+      "case": "lowercase_turkish_name",
+      "passed": true,
+      "output": "[PERSON]."
+    },
+    {
+      "case": "contextual_single_name",
+      "passed": true,
+      "output": "the person in the blue coat was [PERSON]."
+    }
+  ],
+  "turkish_statistical_ner": false
+}

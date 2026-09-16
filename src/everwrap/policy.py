@@ -34,7 +34,7 @@ class SingleNotePolicy:
 
     def __post_init__(self):
         try:
-            if self.access_mode not in ("single_note", "denylist") or self.content_mode not in ("blocked", "unredacted"):
+            if self.access_mode not in ("single_note", "denylist") or self.content_mode not in ("blocked", "unredacted", "redacted"):
                 raise AccessDenied()
             normalized = (None if self.allowed_note_id is None and self.access_mode == "denylist"
                           else canonical_note_id(self.allowed_note_id))

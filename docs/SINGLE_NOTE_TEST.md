@@ -20,13 +20,13 @@ appear in fixtures, Markdown, logs, screenshots, issues, or commits. The committ
 example contains a placeholder and an empty block list only.
 
 Content is independently controlled by `content_mode`: `blocked` by default,
-`unredacted` only with explicit local opt-in. The latter returns original text from
-permitted notes without PII filtering. The latest local configuration change was
-explicitly authorized by the user; committed defaults remain closed.
+`unredacted` for original text, or `redacted` for local best-effort Presidio masking.
+The latest local configuration uses redacted mode at the user's request. The
+private block list stays unchanged, and committed defaults remain closed.
 
 ## Verified with synthetic fixtures
 
-The latest focused suite passed 135 tests across policy/service, OAuth setup,
+The latest focused suite passed 183 tests across policy/service, OAuth setup,
 MCP boundaries, live-adapter argument mapping, and unredacted-mode handling:
 
 - Malformed and blocked direct IDs cause zero backend calls.
@@ -41,11 +41,15 @@ MCP boundaries, live-adapter argument mapping, and unredacted-mode handling:
 - Unselected upstream fields, error text, and resources do not reach MCP output.
 - Policy reload takes effect on the next call; a change during a call blocks output.
 - Only the two wrapper tools are exposed, without prompts or resources.
+- Real Presidio processes allowed titles, bodies, and search snippets.
+- ENML/HTML attributes are dropped; split visible text is joined before detection.
+- Redacted search omits timestamps. Redactor failures never fall back to raw text.
 
 Legacy sanitizer tests use a synthetic canary replacement, not a production
-redactor. No sanitization is claimed for unredacted mode. English and Turkish
-contextual names, dates, birthdays, and addresses still require independent
-privacy validation; six baseline release-gate failures remain unresolved.
+redactor; the new tests separately exercise the actual Presidio engine. No
+sanitization is claimed for unredacted mode. English and Turkish coverage remains
+limited despite the added patterns. The new corpus has two utility false positives,
+and the original stock-baseline release tests still retain six known failures.
 
 ## Connection and live checks
 
@@ -68,6 +72,10 @@ Live verification reports contain status and field names only, not note text or
 private identifiers. The direct Evernote connector stays removed. An existing
 Codex process must reload the updated MCP server before using its new behavior.
 
+The subsequent redacted-mode live check denied the blocked note and returned
+the permitted dummy as plain text with 27 masking placeholders. Its raw text
+was not printed. The block list remains local and is enforced before full reads.
+
 ## Boundaries and remaining work
 
 The wrapper never requests a blocked note body. Upstream search can return blocked
@@ -79,6 +87,7 @@ There is no write access, attachment retrieval, link following, semantic search,
 or alternate-ID fallback. Searches scan up to 100 hits and return at most 10
 permitted rows. Relative-date queries use UTC. Very large notes fail output bounds.
 
-Production PII filtering, exact-output review, and OS isolation remain unfinished.
+Best-effort PII masking is implemented; complete detection, exact-output review,
+and OS isolation are not established.
 This application-level policy cannot constrain an agent that can edit its code or
 configuration, or access backend credentials independently.
