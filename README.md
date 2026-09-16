@@ -57,6 +57,12 @@ with the dummy note's UUID. The local file is Git-ignored; never commit account 
 note identifiers. `SingleNotePolicy.from_file` validates an explicitly supplied
 path. The MCP server loads this file from its repository root at startup.
 
+An optional `blocked_note_ids` list explicitly denies up to 16 note UUIDs. Denial
+wins even if an ID is also the allowed note, and applies to both reads and the
+single-note search. IDs are case-insensitive. Keep this list in the ignored local
+configuration; restart the MCP connection after policy edits. Other notes remain
+denied by default whether or not they appear in the block list.
+
 ```sh
 .venv/bin/python -m pytest tests/test_single_note.py -q
 ```

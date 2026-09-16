@@ -28,13 +28,18 @@ def canonical_note_id(value: object) -> str:
 @dataclass(frozen=True, slots=True)
 class SingleNotePolicy:
     allowed_note_id: str = field(repr=False)
+    blocked_note_ids: frozenset[str] = field(default_factory=frozenset, repr=False)
 
     def __post_init__(self):
         try:
             normalized = canonical_note_id(self.allowed_note_id)
+            if not isinstance(self.blocked_note_ids, frozenset) or len(self.blocked_note_ids) > 16:
+                raise AccessDenied()
+            blocked = frozenset(canonical_note_id(value) for value in self.blocked_note_ids)
         except AccessDenied:
             raise InvalidPolicy("Single-note policy is invalid.") from None
         object.__setattr__(self, "allowed_note_id", normalized)
+        object.__setattr__(self, "blocked_note_ids", blocked)
 
     @classmethod
     def from_file(cls, path: Path) -> "SingleNotePolicy":
@@ -54,14 +59,18 @@ class SingleNotePolicy:
                 return result
 
             data = json.loads(raw, object_pairs_hook=unique_fields)
-            if not isinstance(data, dict) or set(data) != {"allowed_note_id"}:
+            if (not isinstance(data, dict) or "allowed_note_id" not in data
+                    or not set(data) <= {"allowed_note_id", "blocked_note_ids"}):
                 raise ValueError
-            return cls(data["allowed_note_id"])
+            blocked = data.get("blocked_note_ids", [])
+            if type(blocked) is not list or len(blocked) > 16:
+                raise ValueError
+            return cls(data["allowed_note_id"], frozenset(blocked))
         except (OSError, ValueError, TypeError, InvalidPolicy):
             raise InvalidPolicy("Single-note policy is unavailable or invalid.") from None
 
     def authorize(self, note_id: object) -> str:
         normalized = canonical_note_id(note_id)
-        if normalized != self.allowed_note_id:
+        if normalized in self.blocked_note_ids or normalized != self.allowed_note_id:
             raise AccessDenied("Note access denied.")
         return normalized

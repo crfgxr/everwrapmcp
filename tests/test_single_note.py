@@ -193,3 +193,34 @@ def test_valid_local_policy_is_frozen_and_does_not_expose_id_in_repr(tmp_path):
 def test_uppercase_uuid_is_same_identity():
     guid = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
     assert SingleNotePolicy(guid.upper()).authorize(guid) == guid
+
+
+def test_explicit_block_list_loads_and_hides_ids(tmp_path):
+    guid = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+    path = tmp_path / "policy.json"
+    path.write_text(json.dumps({"allowed_note_id": ALLOWED, "blocked_note_ids": [guid.upper()]}))
+    policy = SingleNotePolicy.from_file(path)
+    assert policy.blocked_note_ids == frozenset({guid})
+    assert guid not in repr(policy)
+    assert policy.authorize(ALLOWED) == ALLOWED
+    with pytest.raises(AccessDenied):
+        policy.authorize(guid)
+
+
+@pytest.mark.parametrize("operation", ["read", "search"])
+def test_block_list_overrides_allow_before_fetch(operation):
+    backend = FakeBackend()
+    policy = SingleNotePolicy(ALLOWED, frozenset({ALLOWED}))
+    reader = SingleNoteService(policy, backend, CanarySanitizer())
+    with pytest.raises(AccessDenied):
+        asyncio.run(reader.read_safe_note(ALLOWED) if operation == "read"
+                    else reader.search_safe_notes("chatbot"))
+    assert backend.calls == []
+
+
+@pytest.mark.parametrize("blocked", [None, "*", {}, ["*"], [None], [[]], [ALLOWED] * 17])
+def test_invalid_block_list_fails_closed(tmp_path, blocked):
+    path = tmp_path / "policy.json"
+    path.write_text(json.dumps({"allowed_note_id": ALLOWED, "blocked_note_ids": blocked}))
+    with pytest.raises(InvalidPolicy):
+        SingleNotePolicy.from_file(path)
