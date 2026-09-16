@@ -1,0 +1,171 @@
+"""Authenticate to official Evernote MCP and inspect get_note's schema only.
+
+This setup command has no call_tool or resource-read path. It cannot read notes.
+Tokens stay in the macOS Keychain, not source/configuration files or stdout.
+"""
+
+import asyncio
+import json
+import logging
+import sys
+import webbrowser
+from pathlib import Path
+from urllib.parse import parse_qs, urlsplit
+
+import httpx2
+from keyring.backends.macOS import Keyring
+from mcp import Client
+from mcp.client.auth import AuthorizationCodeResult, OAuthClientProvider
+from mcp.client.streamable_http import streamable_http_client
+from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata, OAuthToken
+from pydantic import AnyUrl
+
+from .policy import SingleNotePolicy
+
+SERVER_URL = "https://mcp.evernote.com/mcp"
+CALLBACK_URL = "http://127.0.0.1:8766/callback"
+KEYCHAIN_SERVICE = "EverWrap:official-evernote-mcp"
+
+
+class KeychainStore:
+    def __init__(self):
+        # Explicit backend: never silently falls back to plaintext token storage.
+        self._keyring = Keyring()
+
+    async def get_tokens(self):
+        value = await asyncio.to_thread(self._keyring.get_password, KEYCHAIN_SERVICE, "tokens")
+        return OAuthToken.model_validate_json(value) if value else None
+
+    async def set_tokens(self, tokens):
+        await asyncio.to_thread(self._keyring.set_password, KEYCHAIN_SERVICE,
+                                "tokens", tokens.model_dump_json())
+
+    async def get_client_info(self):
+        value = await asyncio.to_thread(self._keyring.get_password, KEYCHAIN_SERVICE, "client")
+        return OAuthClientInformationFull.model_validate_json(value) if value else None
+
+    async def set_client_info(self, client_info):
+        await asyncio.to_thread(self._keyring.set_password, KEYCHAIN_SERVICE,
+                                "client", client_info.model_dump_json())
+
+
+def parse_callback(target: str, expected_state: str | None) -> AuthorizationCodeResult:
+    url = urlsplit(target)
+    if url.scheme or url.netloc or url.path != "/callback" or url.fragment:
+        raise ValueError("Invalid authorization callback.")
+    params = parse_qs(url.query, keep_blank_values=True, max_num_fields=10)
+    if (not expected_state or "error" in params
+            or any(len(params.get(k, [])) != 1 for k in ("code", "state"))
+            or params["state"][0] != expected_state or not params["code"][0]
+            or ("iss" in params and len(params["iss"]) != 1)):
+        raise ValueError("Invalid authorization callback.")
+    return AuthorizationCodeResult(code=params["code"][0], state=params["state"][0],
+                                   iss=params.get("iss", [None])[0])
+
+
+class LoopbackCallback:
+    def __init__(self):
+        self.result = asyncio.get_running_loop().create_future()
+        self.expected_state = None
+
+    async def open_browser(self, authorization_url: str):
+        url = urlsplit(authorization_url)
+        if (url.scheme != "https" or url.username or url.password
+                or not url.hostname or not (url.hostname == "evernote.com"
+                or url.hostname.endswith(".evernote.com"))):
+            raise ValueError("Unexpected authorization host.")
+        states = parse_qs(url.query).get("state", [])
+        if len(states) != 1 or not states[0]:
+            raise ValueError("Missing authorization state.")
+        self.expected_state = states[0]
+        if not await asyncio.to_thread(webbrowser.open, authorization_url):
+            raise RuntimeError("Could not open the sign-in browser.")
+        print("Evernote sign-in opened in your browser. Complete it there.", flush=True)
+
+    async def wait(self):
+        return await asyncio.wait_for(self.result, timeout=600)
+
+    async def handle(self, reader, writer):
+        status = "400 Bad Request"
+        message = b"Invalid callback. Return to the Evernote sign-in page."
+        try:
+            request = await asyncio.wait_for(reader.readuntil(b"\r\n\r\n"), 10)
+            method, target, _ = request.split(b"\r\n", 1)[0].decode("ascii").split(" ")
+            if method != "GET" or self.result.done():
+                raise ValueError
+            result = parse_callback(target, self.expected_state)
+            self.result.set_result(result)
+            status = "200 OK"
+            message = b"Authorization response received. You can return to EverWrap."
+        except Exception:
+            pass  # Never log callback URLs, authorization codes, or request bytes.
+        try:
+            writer.write((f"HTTP/1.1 {status}\r\nContent-Type: text/plain\r\n"
+                          f"Content-Length: {len(message)}\r\nCache-Control: no-store\r\n"
+                          "Connection: close\r\n\r\n").encode() + message)
+            await writer.drain()
+        finally:
+            writer.close()
+            await writer.wait_closed()
+
+
+async def inspect_read_schema(client):
+    """Only metadata discovery. Never calls an upstream note or search tool."""
+    cursor = None
+    for _ in range(10):
+        page = await client.list_tools(cursor=cursor)
+        for tool in page.tools:
+            if tool.name == "get_note":
+                return {"name": tool.name, "input_schema": tool.input_schema,
+                        "output_schema": tool.output_schema}
+        cursor = page.next_cursor
+        if cursor is None:
+            break
+    raise RuntimeError("Expected get_note tool was not found.")
+
+
+async def connect():
+    # Validate local restrictions before opening any connection. This is not yet
+    # a note fetcher; the subsequent adapter must enforce this same policy.
+    root = Path(__file__).resolve().parents[2]
+    SingleNotePolicy.from_file(root / ".everwrap-local.json")
+    callback = LoopbackCallback()
+    oauth = OAuthClientProvider(
+        server_url=SERVER_URL,
+        client_metadata=OAuthClientMetadata(
+            client_name="EverWrap local single-note test",
+            redirect_uris=[AnyUrl(CALLBACK_URL)],
+            token_endpoint_auth_method="none",
+        ),
+        storage=KeychainStore(), redirect_handler=callback.open_browser,
+        callback_handler=callback.wait,
+    )
+    listener = await asyncio.start_server(callback.handle, "127.0.0.1", 8766, limit=8192)
+    async with listener:
+        async with httpx2.AsyncClient(auth=oauth, timeout=httpx2.Timeout(30, connect=10)) as http:
+            transport = streamable_http_client(SERVER_URL, http_client=http)
+            async with Client(transport, read_timeout_seconds=60) as client:
+                schema = await inspect_read_schema(client)
+                print("Connected. No notes were read.")
+                print(json.dumps(schema, indent=2))
+
+
+def main():
+    # Authentication libraries may otherwise include credential-bearing URLs in
+    # exceptions/logs. This dedicated command emits only static failures.
+    logging.disable(logging.CRITICAL)
+    try:
+        asyncio.run(connect())
+    except KeyboardInterrupt:
+        print("Connection setup cancelled.", file=sys.stderr)
+        return 130
+    except Exception:
+        print("Evernote connection setup did not complete. No notes were read. "
+              "Check network access, sign-in, and availability of localhost port 8766.",
+              file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -39,6 +39,18 @@ The current session has no callable Evernote connector. The inspected user Codex
 MCP configuration has no Evernote server. This does not establish whether Evernote
 is connected in another app. No Evernote notes have been fetched by this project.
 
+## Connection setup status
+
+The user confirmed there was no existing installation. MCP SDK 2.2.0 and keyring
+25.7.0 are now installed locally. `everwrap.connect` performs OAuth and schema
+discovery only, with Keychain storage and a loopback callback. It has no note-read
+method. The 54 policy tests plus 14 setup tests pass (68 total).
+
+The live setup attempt did not complete. Independent HTTPS checks to PyPI,
+GitHub, and `mcp.evernote.com:443` timed out from the local shell. No successful
+OAuth exchange, live tool schema, or live note read has been verified. Retry the
+documented setup command once local connectivity is restored.
+
 This code is a prototype application-level restriction. It is not an OS sandbox,
 and it cannot constrain an agent with write access to the code or separate access
 to backend credentials. Runtime isolation remains a separate deployment task.
