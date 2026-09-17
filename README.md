@@ -95,12 +95,14 @@ Your private block list and OAuth credentials stay out of the repository.
 
 ## Where it stands
 
-- **246 focused tests passed**, including semantic filtering, large-note paging, date preferences, and masking boundaries.
+- **258 application tests passed**, followed by two additional failure-handling checks; the historical stock baseline is separate.
 - Large notes are selected locally and returned as small masked pages. Ask for a
   recognized latest dated entry or a keyword-matching section without sending the
   whole journal to the model. [Large-note behavior and limits.](docs/LARGE_NOTES.md)
-- **24/26 synthetic benchmark checks passed**; two harmless-text cases were over-masked.
+- **25/26 synthetic benchmark checks passed**; one harmless-code case was over-masked.
 - Blocked IDs are denied before full-note reads. Blocked search rows are discarded locally.
 
 Independent prototype; not affiliated with Evernote. This is not an OS security sandbox.
 [Results](docs/RESULTS.md) · [Redaction details](docs/REDACTION.md) · [Access policy and tests](docs/SINGLE_NOTE_TEST.md)
+
+[Improvement priorities, duplication, and open questions](docs/IMPROVEMENTS.md).
