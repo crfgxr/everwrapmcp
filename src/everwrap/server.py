@@ -26,6 +26,7 @@ def build_server(service) -> Server:
                          "are denied before fetch. Local redacted mode masks detected sensitive spans "
                          "with Presidio and returns a bounded plain-text page (default 4000 characters). "
                          "Use view=latest for the newest recognized standalone date heading; date visibility follows local policy. "
+                         "Optionally set year with view=latest to restrict dated entries to that year. "
                          "Use view=query with keywords for local section selection, or start/end. "
                          "Follow next.section and next.offset using view=start for more text. "
                          "Latest means recognized headings only; never infer a missing date. "
@@ -36,6 +37,7 @@ def build_server(service) -> Server:
                 "properties": {
                     "note_id": {"type": "string", "minLength": 36, "maxLength": 36},
                     "view": {"type": "string", "enum": ["start", "end", "latest", "query"]},
+                    "year": {"type": "integer", "minimum": 1, "maximum": 9999},
                     "query": {"type": "string", "minLength": 1, "maxLength": 500},
                     "section": {"type": "integer", "minimum": 0},
                     "offset": {"type": "integer", "minimum": 0},
@@ -77,7 +79,7 @@ def build_server(service) -> Server:
             if type(args) is not dict:
                 raise AccessDenied()
             if (params.name == "read_safe_note" and 'note_id' in args
-                    and set(args) <= {'note_id', 'view', 'query', 'section', 'offset', 'max_chars'}):
+                    and set(args) <= {'note_id', 'view', 'query', 'section', 'offset', 'max_chars', 'year'}):
                 safe = await service.read_safe_note(**args)
             elif (params.name == "search_safe_notes" and "query" in args
                   and set(args) <= {"query", "sort", "limit"}):

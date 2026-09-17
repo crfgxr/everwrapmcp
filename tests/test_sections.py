@@ -153,3 +153,22 @@ def test_revocation_during_section_read_blocks_response(tmp_path, redactor):
     service = ConfiguredService(path, lambda _: RevokingBackend(), lambda: redactor)
     with pytest.raises(ProcessingBlocked):
         asyncio.run(service.read_safe_note(ALLOWED, max_chars=256))
+
+
+def test_latest_can_be_restricted_to_a_year(redactor):
+    markup = ('<div>2028-04-17</div><div>future entry</div>'
+              '<div>2026-01-01</div><div>older entry</div>'
+              '<div>2026-09-17</div><div>target entry</div>')
+    page = read_section(markup, redactor, view='latest', year=2026)
+    assert 'target entry' in page['content']
+    assert 'future entry' not in page['content'] and 'older entry' not in page['content']
+    assert read_section(markup, redactor, view='latest', year=2025)['selection_status'] == 'no_recognized_date_heading'
+
+
+@pytest.mark.parametrize('selection', [{'year': 2026}, {'view': 'latest', 'year': True},
+                                     {'view': 'latest', 'year': '2026'}, {'view': 'latest', 'year': 10000}])
+def test_invalid_year_rejected_before_fetch(redactor, selection):
+    backend = Backend()
+    with pytest.raises(AccessDenied):
+        asyncio.run(NoteService(policy('redacted'), backend, redactor).read_safe_note(ALLOWED, **selection))
+    assert backend.reads == []

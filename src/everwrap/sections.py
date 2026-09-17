@@ -31,7 +31,7 @@ def source_limit():
         raise ProcessingBlocked('Invalid local source limit.') from None
 
 
-def validate_selection(view, section, offset, max_chars, query):
+def validate_selection(view, section, offset, max_chars, query, year=None):
     if (type(view) is not str or view not in ('start', 'end', 'latest', 'query')
             or type(section) is not int or section < 0
             or type(offset) is not int or offset < 0
@@ -39,7 +39,8 @@ def validate_selection(view, section, offset, max_chars, query):
             or (query is not None and (type(query) is not str or not 1 <= len(query) <= 500 or not query.strip()))
             or (view == 'query' and query is None)
             or (view != 'query' and query is not None)
-            or (view != 'start' and section != 0)):
+            or (view != 'start' and section != 0)
+            or (year is not None and (type(year) is not int or not 1 <= year <= 9999 or view != 'latest'))):
         raise AccessDenied('Invalid section request.')
 
 
@@ -113,13 +114,14 @@ def sections_from_markup(markup):
 
 
 def read_section(markup, redactor, *, view='start', section=0, offset=0,
-                 max_chars=4_000, query=None):
-    validate_selection(view, section, offset, max_chars, query)
+                 max_chars=4_000, query=None, year=None):
+    validate_selection(view, section, offset, max_chars, query, year)
     sections, dates = sections_from_markup(markup)
     if view == 'end':
         section = len(sections) - 1
     elif view == 'latest':
-        candidates = [(value, -i, i) for i, value in enumerate(dates) if value is not None]
+        candidates = [(value, -i, i) for i, value in enumerate(dates)
+                      if value is not None and (year is None or value.year == year)]
         if not candidates:
             return {'content': '', 'selection_status': 'no_recognized_date_heading',
                     'has_more': False, 'next': None}

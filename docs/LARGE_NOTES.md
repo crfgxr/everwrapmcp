@@ -26,6 +26,9 @@ the first page, not the complete note. Check `has_more` and `next`.
 - `view: "start"` (default): select `section` (default 0).
 - `view: "end"`: select the last section; this is not necessarily the latest entry.
 - `view: "latest"`: select the beginning of the newest recognized dated entry.
+- With `view: "latest"`, optional `year` restricts selection to that calendar year.
+  No matching heading returns the explicit empty-result status; other years are
+  never used as a fallback.
 - `view: "query"`, `query: "prototype architecture"`: first section containing all
   whitespace-separated keywords, case-insensitively. This is not semantic search.
 - `max_chars`: output body budget, default 4,000, allowed range 256–16,000.
