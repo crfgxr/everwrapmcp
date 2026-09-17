@@ -10,11 +10,39 @@ user's computer. EverWrapMCP currently runs on macOS with credentials in Keychai
 
 | User's client | Connection path | EverWrapMCP status |
 | --- | --- | --- |
-| Codex local | Local stdio MCP registration | Live tested |
+| Windows clients | Native wrapper runtime unavailable | Credential backend and Windows installation/testing still needed |
+| Codex local on Mac | Local stdio MCP registration | Live tested |
 | Claude Desktop chat on Mac | Local MCP configuration; a desktop extension could simplify installation later | Manual setup documented; not live tested; no EverWrapMCP extension bundle yet |
 | Claude Code on Mac | Local stdio MCP registration | Documented; not live tested |
 | ChatGPT cloud chat | Private Secure MCP Tunnel to the local wrapper, or an authenticated public HTTPS MCP service | Tunnel setup documented; not live tested; no hosted EverWrapMCP service |
 | Claude web/mobile or cloud remote connector | Authenticated, internet-reachable remote MCP endpoint | Not implemented/tested as an EverWrapMCP deployment |
+
+## Windows: upstream compatibility versus wrapper support
+
+Evernote documents a remote Streamable HTTP service with OAuth that can be used
+by any compliant MCP client. Its guide does not impose a macOS requirement or
+provide a Windows-specific EverWrapMCP installation procedure.
+[Evernote client requirements](https://dev.evernote.com/mcp/clients/any) ·
+[Evernote tested clients](https://dev.evernote.com/mcp/supported-clients).
+
+**Native Windows support is not implemented in this EverWrapMCP release.** This is
+a limitation of the wrapper, not a stated operating-system restriction of Evernote's
+remote service. The wrapper currently imports the macOS Keychain backend directly.
+A Windows-capable MCP client alone does not make that local wrapper portable.
+
+Before a Windows release, we need:
+
+- An explicitly selected secure Windows credential store, with no plaintext fallback.
+- PowerShell setup, Windows Python executable paths and private-file ACL handling;
+  Unix `chmod` is not an equivalent Windows permissions check.
+- Windows dependency/model installation and browser OAuth callback testing.
+- End-to-end synthetic read, block-list denial, masking, refresh/restart and removal tests.
+
+WSL is not a verified workaround: the current macOS credential backend is still a
+blocker. A Windows client reaching a separate Mac-hosted wrapper would require a
+secured remote deployment that we have not implemented or tested. Connecting
+straight to Evernote bypasses EverWrapMCP's blocking and masking; do not describe
+that as a privacy-equivalent workaround.
 
 ## ChatGPT: additional connection setup
 
@@ -56,7 +84,7 @@ configuration is a separate mechanism, not a way to enable claude.ai or mobile.
    isolation, authentication, storage/retention controls and operating costs.
    Current macOS Keychain code is not a multi-user cloud deployment.
 
-For sharing today, describe EverWrapMCP as a local experimental MCP wrapper, live
+For sharing today, describe EverWrapMCP as a local MCP wrapper in preview release, live
 verified with Codex, with other-client setup guides awaiting validation. Do not
 advertise “paste into ChatGPT and it works.” Researching these routes has not
 installed a tunnel, exposed a server or changed repository visibility.

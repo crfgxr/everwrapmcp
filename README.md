@@ -16,6 +16,9 @@ Evernote → EverWrapMCP on your Mac → your AI assistant
 It connects to [Evernote’s official MCP server](https://dev.evernote.com/mcp).
 MCP is the protocol that lets an AI assistant use external tools and data.
 
+**Windows:** Evernote’s remote service is client-based; this wrapper’s native
+Windows support is not implemented yet. [Current blockers and pitfalls](docs/CLIENT_COMPATIBILITY.md#windows-upstream-compatibility-versus-wrapper-support).
+
 ## See the difference
 
 Fictional example, checked with the local redactor:
