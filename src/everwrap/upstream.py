@@ -22,7 +22,7 @@ async def official_client():
     auth = ReadOnlyOAuthProvider(
         server_url=SERVER_URL,
         client_metadata=OAuthClientMetadata(
-            client_name="EverWrap local single-note test",
+            client_name="EverWrapMCP",
             redirect_uris=[AnyUrl(CALLBACK_URL)],
             token_endpoint_auth_method="none", scope="read",
         ),

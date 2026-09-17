@@ -1,3 +1,17 @@
+# Current results — 2026-09-17
+
+The production path uses Lingua EN/TR routing, English spaCy, Turkish BERT and
+Presidio rules/anonymization. The current synthetic report is
+[redaction-results.json](redaction-results.json): **25/26** checks pass; the
+remaining utility failure masks `asyncio`. The live semantic-search repeat
+returned substantially more readable Turkish snippets with masking enabled.
+This is not a general recall or relevance benchmark.
+
+See [redaction validation](REDACTION.md#language-routing-validation-2026-09-17)
+for application tests and [known gaps](IMPROVEMENTS.md) for outstanding work.
+The chronology below records earlier stages; its test counts and configurations
+are historical, not current installation claims.
+
 # Baseline result — 2026-09-17
 
 **Stock-baseline decision: unsuitable for reliable privacy protection.** The
@@ -29,7 +43,7 @@ The passing English person example does not establish English privacy coverage.
 
 ## Integration checks — 2026-09-17
 
-The latest focused suite passed 183 tests covering single-note and denylist
+At this earlier stage, the focused suite passed 183 tests covering single-note and denylist
 authorization, explicit block-list precedence, OAuth setup safeguards, upstream
 argument mapping, response validation, policy reload, and the MCP boundary.
 These tests use synthetic fixtures. Real-Presidio tests now validate selected
@@ -57,19 +71,19 @@ recognizers. It normalizes text and masks the union of overlapping detected span
 ENML becomes plain text; titles and search snippets are also processed. Redacted
 search omits date metadata. Processing failures never return raw note text.
 
-The expanded synthetic report is `redaction-results.json`: **24/26** corpus checks
+The earlier English-only production configuration achieved **24/26** corpus checks
 passed. All targeted sensitive values were removed, including the values missed
 in the six original baseline cases. Two utility controls fail: the model masks
 `asyncio` as a person and a harmless Turkish word as an organization. Some
 conservative patterns can remove extra context. These limitations are retained
-in the report rather than hidden or described as privacy guarantees.
+here as historical limitations. The linked report now reflects the newer configuration.
 
 A fresh stdio server denied the blocked ID and returned the permitted dummy in
 redacted plain text with 27 masking placeholders. Only placeholder counts/types
 were printed during this check, not live note text or identifiers.
 
 The original stock-baseline test command still reports **6 failed, 4 passed**;
-the original report was not overwritten. Stronger Turkish statistical NER,
-broader adversarial coverage, exact-output review, and OS isolation remain work
-items. Passing these fixtures does not establish that every name, birthday,
+the original stock-baseline report was not overwritten. Turkish statistical NER
+has since been added. Broader adversarial coverage, exact-output review, and OS
+isolation remain unfinished. Passing these fixtures does not establish that every name, birthday,
 address, secret, or contextual identifier is detected.

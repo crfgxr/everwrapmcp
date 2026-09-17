@@ -57,8 +57,9 @@ same sanitizer. The wrapper does not request attachments separately.
 - Snippet truncation is explicit. Do not treat a partial passage as a complete entry.
 - Semantic indexing can lag edits. Dates within an entry differ from note metadata.
 - English and Turkish live queries both returned results; that is a smoke test,
-  not a measured cross-language relevance benchmark. Turkish text may be heavily
-  over-masked by the current English NLP model and bilingual heuristics.
+  not a measured cross-language relevance benchmark. English/Turkish routing and
+  Turkish NER improved readability in a later live repeat, but false positives
+  and missed sensitive spans remain possible. See [masking details](REDACTION.md).
 - The block list controls export through EverWrapMCP. Evernote may already index
   blocked notes on its own servers; local filtering cannot undo that indexing.
 - Detection remains best-effort. No raw fallback, graph, or persistent note index

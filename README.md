@@ -131,7 +131,7 @@ Your private block list and OAuth credentials stay out of the repository.
 
 ## Where it stands
 
-- **258 application tests passed**, followed by two additional failure-handling checks; the historical stock baseline is separate.
+- **260 application tests passed**; the historical stock baseline is separate.
 - Large notes are selected locally and returned as small masked pages. Ask for a
   recognized latest dated entry or a keyword-matching section without sending the
   whole journal to the model. [Large-note behavior and limits.](docs/LARGE_NOTES.md)

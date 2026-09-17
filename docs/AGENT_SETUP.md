@@ -58,7 +58,7 @@ integration is verified until the target client actually calls the wrapper.
 
 Report the installed location, client, tool availability, completed checks and
 remaining user steps. Explain that masking is fallible, dates are masked by
- default unless configured otherwise, and processed content reaches the AI
+default unless configured otherwise, and processed content reaches the AI
 provider. Keep actual note IDs, note text and private policies out of commits,
 issues and shared installation reports. Use the user's real-note scope only when
 explicitly established; installation is not an account-wide retrieval request.

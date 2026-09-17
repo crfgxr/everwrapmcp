@@ -92,9 +92,9 @@ Presidio reference: https://presidio.dataprivacystack.org/anonymizer/
 
 ## Language-routing validation (2026-09-17)
 
-The application regression suite passed 258 tests (historical stock baseline
-excluded). Two additional missing-model/error-sanitization checks also passed;
-the final targeted language suite passed all 14 tests. Tests include ordinary
+The application regression suite passed 260 tests (historical stock baseline
+excluded), including missing-model/error-sanitization checks. The targeted
+language suite passed all 14 tests. Tests include ordinary
 Turkish prose, bilingual names, contacts, secrets, addresses, long-token-window
 tails, block-before-fetch, and absence of raw fallback. The synthetic corpus now
 passes 25/26; the remaining false positive masks the programming name `asyncio`.

@@ -167,7 +167,7 @@ def main():
         return 130
     except Exception:
         import sys
-        print("EverWrap could not start safely. Check local configuration and runtime.", file=sys.stderr)
+        print("EverWrapMCP could not start safely. Check local configuration and runtime.", file=sys.stderr)
         return 1
     return 0
 

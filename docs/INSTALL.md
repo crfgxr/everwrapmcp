@@ -81,7 +81,7 @@ absolute paths with your checkout location. You can run `pwd -P` there to find i
 ```
 
 Save and fully quit/reopen Claude Desktop. Check that EverWrapMCP exposes
-`read_safe_note` and `search_safe_notes`. This is local developer configuration,
+`read_safe_note`, `search_safe_notes`, and `semantic_search_safe_notes`. This is local developer configuration,
 not an extension-directory listing or a remote connector URL.
 [Official local-server instructions](https://modelcontextprotocol.io/docs/develop/connect-local-servers).
 These setup steps are documentation-checked, but this project's Claude Desktop
@@ -208,7 +208,7 @@ retrieval in redacted denylist mode. [Semantic search guide](SEMANTIC_SEARCH.md)
 ## Run the checks
 
 ```sh
-.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py tests/test_live.py tests/test_redaction.py tests/test_benchmark.py -q
+.venv/bin/python -m pytest --ignore=tests/test_release_gate.py -q
 PYTHONPATH=src .venv/bin/python -m experiments.redaction
 ```
 

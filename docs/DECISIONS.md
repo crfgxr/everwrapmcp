@@ -1,4 +1,10 @@
-# Initial assessment
+# Design decisions
+
+## Historical handoff assessment
+
+The following assessment predates the current implementation. Notebook-level
+scoping and a manual review gate were proposals, not implemented guarantees.
+The current policy uses note IDs; the implemented decisions below take precedence.
 
 The supplied handoff establishes the right boundary: upstream raw data is handled
 locally, notebook authorization is repeated for reads, and only newly constructed
@@ -26,16 +32,17 @@ Changes needed before claiming its definition of done:
 
 ## Implemented prototype decisions
 
-- A local stdio MCP server exposes only `read_safe_note` and `search_safe_notes`.
-  Live reads and keyword searches are implemented. The names refer to access
+- A local stdio MCP server exposes `read_safe_note`, `search_safe_notes` and
+  `semantic_search_safe_notes`. Live reads, keyword search and semantic search
+  are implemented. The names refer to access
   controls; complete PII removal is not promised by their names.
 - Access defaults to one locally configured note. Explicit `denylist` mode allows
   all other IDs while enforcing the private block list. Denial always wins.
 - Content defaults to `blocked`. Explicit local `unredacted` opt-in permits
   original text from allowed notes to reach the assistant. Local `redacted` mode
-  uses Presidio Analyzer and Anonymizer with the installed English NLP model plus
-  bilingual patterns and credential recognizers. This is best-effort detection,
-  not a full Turkish NER model or a guarantee that no PII remains.
+  uses Presidio Analyzer and Anonymizer with Lingua language routing, English
+  spaCy and pinned Turkish BERT NER, plus bilingual patterns and credential
+  recognizers. Detection remains best-effort, not a guarantee that no PII remains.
 - Redaction applies to titles, bodies, and search snippets. ENML is flattened
   without executing markup or fetching resources. Raw markup attributes and
   search timestamps are omitted. A redactor/model error blocks the entire call;

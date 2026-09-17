@@ -7,7 +7,7 @@ block lists and credentials out of examples, telemetry and commits.
 ## Current evidence
 
 Local English/Turkish routing and masking are implemented. The application suite
-passed 258 tests, followed by two additional passing failure-handling checks.
+passed 260 tests, including the additional failure-handling checks.
 The final targeted language suite passed 14 tests. The separate historical stock
 baseline still has six known failures; it is not the production redactor.
 The synthetic masking report passes 25/26 cases; the remaining utility failure
@@ -142,3 +142,22 @@ needs access enforcement, deletion/block propagation, source-version tracking,
 retention rules and protection against stale facts. Graph links and summaries can
 leak information even when the original note is no longer returned. Do not create
 an account-wide index as an implicit performance optimization.
+
+## Additional languages: proposed, not enabled
+
+Lingua supports many languages, but this runtime is configured for English and
+Turkish only. Expanding identification alone does not provide PII protection.
+Each supported language needs an evaluated NER model or a validated multilingual
+model, localized recognizers/context, mixed-language and unsupported-language
+behavior, and held-out privacy/readability tests. Check licenses, dependencies,
+install size, cold start and warm latency for each candidate.
+
+Prefer opt-in language packs and incremental releases driven by users' languages.
+Do not load ten large models for every user or claim a universal "top ten" without
+defining the audience. Compare shared multilingual NER against separate models
+on each language; an aggregate score can hide poor coverage in one language.
+Unsupported or uncertain text must not silently be treated as reliably masked.
+The current EN/TR-only detector can misclassify other-language text; a broader
+unsupported-language detector and an explicit fail-closed policy need evaluation.
+
+Source: [Lingua language list](https://github.com/pemistahl/lingua-py#4-which-languages-are-supported).

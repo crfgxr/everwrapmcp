@@ -42,7 +42,7 @@ class ReadOnlyOAuthProvider(OAuthClientProvider):
 
 def require_read_only(tokens):
     if not tokens.scope or set(tokens.scope.split()) != {"read"}:
-        raise ValueError("EverWrap requires a read-only OAuth grant.")
+        raise ValueError("EverWrapMCP requires a read-only OAuth grant.")
     return tokens
 
 
@@ -103,7 +103,7 @@ class LoopbackCallback:
         self.expected_state = states[0]
         # This URL contains a public client ID, state, and PKCE challenge, not
         # the verifier, authorization code, or access/refresh tokens.
-        print("Authorize EverWrap with read-only access:", flush=True)
+        print("Authorize EverWrapMCP with read-only access:", flush=True)
         print(authorization_url, flush=True)
         try:
             opened = await asyncio.to_thread(webbrowser.open, authorization_url)
@@ -126,7 +126,7 @@ class LoopbackCallback:
             result = parse_callback(target, self.expected_state)
             self.result.set_result(result)
             status = "200 OK"
-            message = b"Authorization response received. You can return to EverWrap."
+            message = b"Authorization response received. You can return to EverWrapMCP."
         except Exception:
             pass  # Never log callback URLs, authorization codes, or request bytes.
         try:
@@ -163,7 +163,7 @@ async def connect():
     oauth = ReadOnlyOAuthProvider(
         server_url=SERVER_URL,
         client_metadata=OAuthClientMetadata(
-            client_name="EverWrap local single-note test",
+            client_name="EverWrapMCP",
             redirect_uris=[AnyUrl(CALLBACK_URL)],
             token_endpoint_auth_method="none",
             scope="read",
