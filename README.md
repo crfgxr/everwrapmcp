@@ -93,10 +93,21 @@ Before enabling access beyond the test note, your setup agent should ask:
 > note IDs, or add them directly to the private local policy if you prefer not to
 > put identifiers in chat. You don't need to share their contents.”
 
-On Evernote for Mac, select the note and use **Control + Option + Command + C**
-to copy its internal link. Paste it into the private setup conversation or local
-policy workflow—not a public issue. Do not make the note public.
-[Evernote's note-link instructions](https://help.evernote.com/hc/en-us/articles/208313588-Note-links).
+On Evernote for Mac:
+
+1. Select the note you want to block.
+2. In the macOS menu bar at the top of the screen, look under **Note → Copy internal link**.
+   Menu placement can vary by version; do not rely on the right-click menu alone.
+3. Alternatively, use **Control + Option + Command + C**, the documented internal-link shortcut.
+4. Paste the link into your private setup conversation or local policy workflow—not
+   a public issue. You do not need to make the note public.
+
+Evernote also documents **Copy internal link** in the note's three-dot menu;
+use whichever location your version exposes. The menu-bar route above reflects
+the Mac workflow reported during this project's testing; the official references
+confirm the shortcut and three-dot alternative.
+[Note links](https://help.evernote.com/hc/en-us/articles/208313588-Note-links) ·
+[Evernote's three-dot-menu instructions](https://help.evernote.com/hc/en-us/articles/360001858027-What-to-do-if-some-of-your-content-is-missing).
 
 An internal link has this shape (placeholders only):
 

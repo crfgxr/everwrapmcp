@@ -44,6 +44,9 @@ placeholder with that note's GUID and setting `content_mode` to `redacted`:
 }
 ```
 
+To obtain the link, see [the Mac menu-bar and shortcut steps](../README.md#choose-the-notes-to-block).
+Use Copy internal link, not public sharing.
+
 For an internal link shaped like `evernote:///view/ACCOUNT/SHARD/NOTE_GUID/OTHER_GUID`,
 use `NOTE_GUID`, the first UUID after the shard. Keep actual IDs and links private.
 Then authenticate the **wrapper**, not a separate direct Evernote connector:
