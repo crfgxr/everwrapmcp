@@ -1,163 +1,80 @@
 # EverWrap
 
-A local access-control wrapper for Evernote MCP with optional local Presidio
-redaction. Exposes only `read_safe_note` and `search_safe_notes` over stdio.
+**Ask AI about your Evernote notes. Choose what it can read.**
 
-**Status: live read-only OAuth, note reads, and keyword searches work.** Content
-is disabled by default. Local configuration can enable **redacted** or **unredacted**
-output from permitted notes. Presidio masks detected sensitive spans, but neither
-mode nor the tool names guarantee complete PII removal. English statistical NLP
-and supplemental English/Turkish patterns are implemented; full Turkish NER is not.
+A small local wrapper that blocks selected notes and masks detected sensitive text
+before returning results to your AI assistant.
 
-## Access and content modes
+**Private preview · macOS · read-only · experimental**
 
-Policy lives only in the ignored `.everwrap-local.json`:
+## The problem
 
-- `access_mode: "single_note"` is the default. Only `allowed_note_id` is permitted.
-- `access_mode: "denylist"` permits all IDs except those in `blocked_note_ids`.
-- `blocked_note_ids` holds up to 16 UUIDs. Explicit denial always wins, including
-  when a blocked ID is also the single allowed ID. UUIDs are case-insensitive.
-- `content_mode: "blocked"` is the default and stops content calls before network
-  access. `content_mode: "redacted"` runs local Presidio on titles, bodies, and
-  snippets, replacing detected spans with placeholders. Errors block output;
-  there is no raw-text fallback. `content_mode: "unredacted"` permits original text,
-  titles, and search snippets to reach the assistant without PII redaction.
+Your Evernote account holds useful ideas alongside personal details. You want AI
+to help with the ideas, without manually cleaning every note or sharing everything.
 
-Copy `single-note.example.json` to `.everwrap-local.json` and replace its placeholder
-with a test-note UUID for the default single-note setup. To use denylist access,
-edit the local file to set that access mode and populate its private block list;
-`allowed_note_id` is optional and unused in denylist mode. Enabling denylist access
-does not by itself enable content: select a content mode separately.
+## The solution
 
-The server reloads policy on every call and discards results if policy changes
-while a request is running. Missing, malformed, or unsupported configuration fails
-closed. Tool arguments cannot change either mode or the block list. After updating
-the server code, restart the MCP connection to load the new implementation.
+EverWrap sits between your AI client and Evernote:
 
-### What is blocked
+- **Choose the notes.** Start with one test note, or allow your notes except a private block list.
+- **Mask detected details.** Local Presidio processing covers titles, note bodies, and search snippets.
+- **Keep originals intact.** The wrapper searches and reads; it cannot edit your notes.
 
-Direct reads check local authorization before opening the upstream connection,
-then verify the returned ID matches the requested ID. Search results are checked
-by ID before titles, snippets, or timestamps are returned. Blocked note bodies are
-never fetched. The official search API can return a blocked note's metadata and
-snippet to the local wrapper; that entire row is discarded locally, not sent to
-the assistant. This is a local policy, not a restriction on Evernote's OAuth grant.
+```text
+Evernote → EverWrap on your Mac → your AI assistant
+           block + mask
+```
 
-Only selected fields are returned. No upstream errors, resource manifests, tags,
-tasks, notebook metadata, or raw tool responses are forwarded. Links and attachments
-are not followed. No write tools, semantic search, resources, or prompts are exposed.
-Search uses Evernote keyword/search grammar, scans at most the first 100 hits,
-returns at most 10 permitted rows, and uses UTC for relative date operators.
+A synthetic example:
 
-Redacted reads return plain text with placeholders such as `[PERSON]`, `[SECRET]`,
-and `[REDACTED]`. ENML attributes, links, comments, and hidden payloads are omitted;
-visible text is normalized before detection. Search titles/snippets also pass
-through redaction, and search timestamps are omitted in this mode. Routing IDs
-remain available for authorized follow-up reads. See `docs/REDACTION.md` for limits.
+```text
+Before: Talk to Alex Smith about the chatbot.
+After:  Talk to [PERSON] about the chatbot.
+```
 
-A development folder or same-user Keychain is not an OS-enforced security boundary.
-This wrapper cannot constrain a separate direct connector or an agent with access
-to modify its code/configuration or retrieve backend credentials. Note content is
-untrusted data; access controls do not remove instructions embedded in a note.
+**Masking is best-effort.** It can miss sensitive details or mask harmless words.
+Processed text still goes to your AI provider. English NLP and extra English/Turkish
+patterns are included; a full Turkish NLP model is not. [See the limits.](docs/REDACTION.md)
 
-## Keep the local policy private
+## Install in your client
 
-The block list, actual note IDs, account links, and OAuth credentials must stay out
-of source, documentation, fixtures, logs, issues, and commits. Commit only the empty
-example and synthetic test IDs. `.everwrap-local.json` is Git-ignored; verify it is
-also untracked before pushing because ignore rules do not remove existing history.
-OAuth tokens and client registration are stored in macOS Keychain, never in the repo.
-
-## Install and connect on macOS
+You'll need macOS, Git, [uv](https://docs.astral.sh/uv/getting-started/installation/),
+and an Evernote account with MCP access. This repository is currently private;
+cloning requires GitHub access.
 
 ```sh
-uv sync
+git clone https://github.com/crfgxr/everwrap.git
+cd everwrap
+uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
-PYTHONPATH=src .venv/bin/python -m everwrap.connect
 ```
 
-Configure the local policy before connecting. The setup command performs OAuth
-and inspects `get_note` schema only; it does not read or search notes. Complete
-sign-in in the browser. Consent and stored grants are restricted to `read`.
-The callback binds to `127.0.0.1:8766`, with state, PKCE, and issuer validation.
-If browser launch fails, the command prints a manual sign-in link. Do not share
-callback URLs containing authorization codes. Credentials use macOS Keychain
-service `EverWrap:official-evernote-mcp`.
+Next, [configure a test note and sign in to Evernote](docs/INSTALL.md#configure-and-sign-in),
+then connect your client:
 
-SDK 2.2.0 replaces caller scopes during discovery, so a version-pinned hook
-restores `read` before generating consent. Regression tests cover the behavior.
-The live server uses the saved grant and can refresh it; when interactive sign-in
-is needed, run the local setup command again. It does not expose OAuth flows as tools.
+| Client | Setup |
+| --- | --- |
+| Claude Desktop on macOS | [Local MCP configuration](docs/INSTALL.md#claude-desktop) |
+| Claude Code on macOS | [One registration command](docs/INSTALL.md#claude-code) |
+| ChatGPT | [Secure MCP Tunnel guide](docs/INSTALL.md#chatgpt) — advanced; not yet tested here |
+| Codex | [Local MCP setup](docs/INSTALL.md#codex) — verified in this project |
 
-Evernote hosts its MCP at `https://mcp.evernote.com/mcp`; no upstream server binary
-is required. Official instructions: https://dev.evernote.com/mcp
+Claude and ChatGPT instructions are documentation-checked; only Codex has been
+tested end-to-end here. [Full installation guide →](docs/INSTALL.md)
 
-## Register the wrapper with Codex
+## Try it
 
-From the repository root:
+> Use EverWrap to find my latest braindumping note and summarize it.
 
-```sh
-codex mcp add everwrap --env "PYTHONPATH=$PWD/src" -- "$PWD/.venv/bin/python" -m everwrap.server
-```
+Start with the synthetic test note before expanding access. Connect **EverWrap**
+and remove any direct Evernote connector if you want requests to use the wrapper.
+Your private block list and OAuth credentials stay out of the repository.
 
-This updates global Codex MCP configuration. Restart the MCP connection or Codex
-to load changed server code. Keep the direct Evernote connector removed when the
-wrapper is intended to be the only exposed note interface.
+## Where it stands
 
-## Verification
+- **183 focused tests passed**, plus a live dummy-note read with masking applied.
+- **24/26 synthetic benchmark checks passed**; two harmless-text cases were over-masked.
+- Blocked IDs are denied before full-note reads. Blocked search rows are discarded locally.
 
-```sh
-.venv/bin/python -m pytest tests/test_single_note.py tests/test_connect.py tests/test_server.py tests/test_live.py tests/test_redaction.py tests/test_benchmark.py -q
-```
-
-The latest focused run passed 183 tests. Live checks through a fresh stdio server
-confirmed a permitted dummy read, a policy denial for a blocked ID, and a keyword
-search returning a permitted hit. The latest redacted dummy read returned plain
-text with 27 masking placeholders. Real-Presidio integration tests cover titles,
-body text, snippets, metadata omission, split HTML text, and failure handling.
-Live note text and private identifiers were not copied into the repository or
-reports. This proves selected behavior, not complete detection on arbitrary notes.
-
-The runtime is pinned separately in `requirements-live.txt`. Reinstall it after
-`uv sync`, which removes packages outside `uv.lock`. This split is temporary;
-universal dependency resolution previously hit network and platform-metadata issues.
-
-## Privacy-filtering experiment
-
-Synthetic English and Turkish examples evaluate stock Presidio English NLP, secret
-handling gaps, and technical-text preservation. Turkish examples are challenge
-cases, not a claim that the English model supports Turkish.
-
-```sh
-uv run python -m experiments.baseline
-uv run pytest tests/test_benchmark.py tests/test_release_gate.py
-```
-
-Inference runs locally; installation downloads public weights. The saved report
-contains synthetic data only. Four of ten cases pass; six release-gate tests
-intentionally fail on known leaks. Re-run the experiment after changing dependencies
-or cases. Passing a small corpus would not prove general privacy.
-
-The original stock-baseline release tests still report six known failures. They
-remain as historical evidence and are not silently marked passing. The new
-redactor independently removes the expected sensitive values in all ten original
-cases. Its expanded corpus passes **24 of 26** checks: two harmless-text controls
-are over-masked. Run the actual redactor's synthetic report with:
-
-```sh
-PYTHONPATH=src .venv/bin/python -m experiments.redaction
-```
-
-`docs/redaction-results.json` records the results, including false positives.
-Remaining work for stronger privacy:
-
-- Validate contextual names, dates, birthdays, and addresses independently in
-  both English and Turkish, across titles, snippets, and bodies.
-- Extend the implemented credential patterns to more encoded and obfuscated forms.
-- Test metadata leakage, malformed responses, and sanitizer failures.
-- Add local review of exact outbound text and enforce processing/output bounds.
-- Deploy policy and credentials behind an OS-enforced runtime boundary.
-
-Redacted mode is best-effort automatic masking without an exact-output approval
-step. Unredacted mode intentionally skips masking. Neither mode establishes the
-stronger guarantees above. See `docs/RESULTS.md` and `docs/SINGLE_NOTE_TEST.md`.
+Independent prototype; not affiliated with Evernote. This is not an OS security sandbox.
+[Results](docs/RESULTS.md) · [Redaction details](docs/REDACTION.md) · [Access policy and tests](docs/SINGLE_NOTE_TEST.md)
