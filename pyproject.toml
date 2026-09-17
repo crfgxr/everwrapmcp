@@ -6,14 +6,14 @@ license-files = ["LICENSE"]
 description = "EverWrapMCP: local note blocking and sensitive-data masking for Evernote MCP"
 requires-python = ">=3.12,<3.14"
 dependencies = [
-    "en-core-web-lg",
     "presidio-analyzer",
     "presidio-anonymizer",
     "lingua-language-detector==2.2.0",
-    "transformers==5.17.0",
-    "torch==2.14.0",
-    "safetensors==0.8.0",
 ]
+
+[project.optional-dependencies]
+en = ["en-core-web-lg"]
+tr = ["transformers==5.17.0", "torch==2.14.0", "safetensors==0.8.0"]
 
 [dependency-groups]
 dev = ["pytest"]

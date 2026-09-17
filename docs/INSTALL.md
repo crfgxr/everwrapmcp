@@ -16,7 +16,6 @@ git clone https://github.com/crfgxr/everwrapmcp.git
 cd everwrapmcp
 uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
-PYTHONPATH=src .venv/bin/python -m everwrap.language
 ```
 
 The project supports Python 3.12–3.13. Model installation downloads public weights;
@@ -49,7 +48,41 @@ Use Copy internal link, not public sharing.
 
 For an internal link shaped like `evernote:///view/ACCOUNT/SHARD/NOTE_GUID/OTHER_GUID`,
 use `NOTE_GUID`, the first UUID after the shard. Keep actual IDs and links private.
-Then authenticate the **wrapper**, not a separate direct Evernote connector:
+## Choose language packs
+
+After configuring a valid private policy, run the interactive installer:
+
+```sh
+PYTHONPATH=src .venv/bin/python -m everwrap.setup
+```
+
+Choose English (`en`), Turkish (`tr`), or both. Include all languages used in mixed
+notes. For agent-driven setup, use the user's answer explicitly:
+
+```sh
+PYTHONPATH=src .venv/bin/python -m everwrap.setup --languages en tr
+```
+
+Use `--languages en` or `--languages tr` for a single pack. Setup installs only the
+selected model dependencies, runs fictional masking checks, then saves `languages`
+in the ignored local policy. It preserves block lists, access mode and date settings.
+It reads no Evernote notes. Existing model files are not uninstalled.
+
+Routing runs locally and withholds passages identified as unsupported or uncertain.
+Short or mixed-language text can be misclassified; selection is not a guarantee
+that every sensitive detail is found. English and Turkish have regression coverage;
+other packs are not available yet. The block list is enforced before note access.
+
+Existing policies without `languages` retain English-and-Turkish behavior. Rerun
+setup to change packs, then restart the MCP connection. Missing selected models
+block access. Running plain `uv sync` later removes optional model dependencies;
+rerun setup and reinstall `requirements-live.txt` afterward. Developers running the
+full regression suite can install both extras with `uv sync --extra en --extra tr`,
+install live dependencies, and download Turkish weights with `python -m everwrap.language`.
+
+## Authenticate
+
+Authenticate the **wrapper**, not a separate direct Evernote connector:
 
 ```sh
 PYTHONPATH=src .venv/bin/python -m everwrap.connect

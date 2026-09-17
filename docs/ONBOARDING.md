@@ -10,7 +10,7 @@ below is invented; none comes from a user's notes.
 | Step | Your setup agent asks or explains | Example response |
 | --- | --- | --- |
 | Choose a client | “Which app will you use, and are you on macOS?” | “Claude Desktop on my Mac.” The agent explains that this path is documented but not live verified here. |
-| Check languages | “Which languages are your notes in? Do you mix them?” | “English and Turkish, sometimes together.” Both models are installed in this release. |
+| Check languages | “Which languages are your notes in? Do you mix them?” | “English and Turkish, sometimes together.” Setup installs both selected packs, runs fictional checks, and saves the choice locally. |
 | Start small | “Create a note called Garden demo using the fictional text below, then give me its internal note link.” | The agent configures access to that test note only, with masking enabled. |
 | Choose exclusions | “Which notes should always be blocked? Supply their internal links or note IDs; no note contents are needed.” | “Block my fictional Private demo note.” A title alone needs its exact ID before the agent can confirm the block. |
 | Connect | “Complete Evernote's read-only sign-in in your browser.” | You approve the connection yourself; you never paste a password or token into chat. |
@@ -140,15 +140,15 @@ During setup, your agent should ask: **“Which languages do your notes contain?
 Do you mix languages within a note?”** This is about the notes, not the language
 you use to chat with your assistant.
 
-The current release installs **English and Turkish together** and detects which
-to use locally. You do not have to choose a language for every search. There is
-no configurable language-pack selector yet; answering the setup question does
-not change the installed models or guarantee protection in other languages.
+Choose **English, Turkish, or both** during [installation](INSTALL.md#choose-language-packs).
+Only the selected models are installed and loaded; existing downloaded models are
+not removed. The installer verifies fictional names are masked before saving the
+selection. Routing is automatic during use, including mixed notes.
 
-If your notes include another language, the agent should explain that its masking
-has not been validated and should not enable broader access on the assumption
-that language identification is enough. Keep initial testing to a synthetic note.
-Optional, separately validated language packs are a planned improvement.
+Unconfigured or uncertain passages are withheld rather than returned as protected
+text. Short phrases may be withheld unnecessarily, and language identification can
+still be wrong. These tests do not guarantee perfect privacy. Keep initial testing
+to a synthetic note. Other languages require additional validated packs.
 
 
 ## Adding another language

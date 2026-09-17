@@ -43,8 +43,9 @@ complete privacy coverage or consistently good retrieval.
 
 ## Language and masking blind spots to test
 
-- Language detection is restricted to English/Turkish. Other languages are not
-  supported merely because the detector chooses one of those two.
+- Language detection checks the broader Lingua set and withholds unsupported or
+  uncertain units. Benchmark misclassification and false withholding, especially
+  for short text; masking packs still cover only English/Turkish.
 - Mixed languages within one sentence, very short titles, names shared between
   languages, Turkish suffixes, missing diacritics, lowercase names and misspellings.
 - Names split across markup, paragraphs or token windows; unusual addresses,
@@ -157,7 +158,8 @@ Do not load ten large models for every user or claim a universal "top ten" witho
 defining the audience. Compare shared multilingual NER against separate models
 on each language; an aggregate score can hide poor coverage in one language.
 Unsupported or uncertain text must not silently be treated as reliably masked.
-The current EN/TR-only detector can misclassify other-language text; a broader
-unsupported-language detector and an explicit fail-closed policy need evaluation.
+English/Turkish pack selection and broader language detection are implemented.
+Unsupported or uncertain units are withheld. Expand independent evaluation of this
+behavior before adding packs; confident misclassification remains possible.
 
 Source: [Lingua language list](https://github.com/pemistahl/lingua-py#4-which-languages-are-supported).

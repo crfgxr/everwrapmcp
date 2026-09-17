@@ -31,12 +31,12 @@ def test_long_turkish_sentence_tail_is_analyzed():
     assert 'Ayşe' not in output and 'Yılmaz' not in output
 
 
-def test_ambiguous_language_uses_both_models():
+def test_ambiguous_language_is_withheld():
     from types import SimpleNamespace
     from everwrap.language import LanguageAwareAnalyzer
     analyzer = object.__new__(LanguageAwareAnalyzer)
     analyzer.detector = SimpleNamespace(compute_language_confidence_values=lambda _: [])
-    assert analyzer.languages('Alex') == ('en', 'tr')
+    assert analyzer.languages('Alex') == ()
 
 
 def test_detector_failure_does_not_expose_input():

@@ -66,9 +66,9 @@ A repository link alone does not connect an ordinary web chat to your notes.
 
 ## What setup asks you
 
-1. **Your app and note languages.** English and Turkish masking comes installed.
-   Developers can add other languages by integrating suitable detection models
-   and rules, then testing them; there is no install-time language selector yet.
+1. **Your app and note languages.** Choose English, Turkish, or both. Setup installs and tests the selected masking packs; routing is automatic during use.
+   Other languages need additional models, rules and validation. Unsupported or
+   uncertain passages are withheld; language detection is not a privacy guarantee.
    [How language support can be extended](docs/ONBOARDING.md#adding-another-language).
 2. **A fictional test note.** Start with access to just that note.
 3. **Which notes to block.** Provide internal note links or IDs, not their contents.

@@ -19,34 +19,41 @@ def setup_model():
 
 
 class LanguageAwareAnalyzer:
-    def __init__(self, analyzer, english_nlp):
-        from lingua import Language, LanguageDetectorBuilder
-        from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+    def __init__(self, analyzer, english_nlp, languages=("en", "tr")):
+        from lingua import LanguageDetectorBuilder
         import spacy
-        import torch
-        self.detector = LanguageDetectorBuilder.from_languages(
-            Language.ENGLISH, Language.TURKISH).build()
+        self.enabled = tuple(languages)
+        self.detector = LanguageDetectorBuilder.from_all_languages().build()
         self.english = english_nlp
         self.tokens = spacy.blank("en")
         self.rules = analyzer
         # Regex/checksum detectors run for the entire text, regardless of routing.
         self.rules.registry.remove_recognizer("SpacyRecognizer")
-        self.turkish = pipeline("token-classification",
-            model=AutoModelForTokenClassification.from_pretrained(
-                str(MODEL_PATH), local_files_only=True, trust_remote_code=False,
-                use_safetensors=True),
-            tokenizer=AutoTokenizer.from_pretrained(
-                str(MODEL_PATH), local_files_only=True, trust_remote_code=False),
-            aggregation_strategy="simple", device=-1)
-        # Keep CPU work bounded; models stay resident across reads.
-        torch.set_num_threads(min(torch.get_num_threads(), 4))
+        self.turkish = None
+        if "tr" in self.enabled:
+            from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
+            import torch
+            self.turkish = pipeline("token-classification",
+                model=AutoModelForTokenClassification.from_pretrained(
+                    str(MODEL_PATH), local_files_only=True, trust_remote_code=False,
+                    use_safetensors=True),
+                tokenizer=AutoTokenizer.from_pretrained(
+                    str(MODEL_PATH), local_files_only=True, trust_remote_code=False),
+                aggregation_strategy="simple", device=-1)
+            # Keep CPU work bounded; models stay resident across reads.
+            torch.set_num_threads(min(torch.get_num_threads(), 4))
 
     def languages(self, text):
         from lingua import Language
         scores = self.detector.compute_language_confidence_values(text)
-        if not scores or scores[0].value < .8:
-            return ("en", "tr")
-        return ("tr",) if scores[0].language == Language.TURKISH else ("en",)
+        enabled = getattr(self, "enabled", ("en", "tr"))
+        if not scores:
+            return ()
+        best = scores[0]
+        code = {Language.ENGLISH: "en", Language.TURKISH: "tr"}.get(best.language)
+        if code not in enabled or best.value < .15:
+            return ()
+        return (code,)
 
     def turkish_entities(self, text):
         # Explicit token windows: do not rely on pipeline overflow behavior.
@@ -78,11 +85,16 @@ class LanguageAwareAnalyzer:
                 score_threshold=score_threshold, nlp_artifacts=artifacts)
             # Sentence/paragraph units handle language switches within a note.
             # Keep exact source offsets; no normalization or reconstruction here.
-            for unit in re.finditer(r"[^\n.!?]+(?:[.!?]+|$)|[^\n]+$", text, re.MULTILINE):
-                part = unit.group()
-                if not part.strip():
+            segmentation = re.sub(r"[^\s@]+@[^\s@]+", lambda m: m.group().rstrip(".!?").replace(".", "_") + m.group()[len(m.group().rstrip(".!?")):], text)
+            for unit in re.finditer(r"[^\n.!?]+(?:[.!?]+|$)|[^\n]+$", segmentation, re.MULTILINE):
+                part = text[unit.start():unit.end()]
+                if (not any(c.isalpha() for c in part)
+                        or part.strip() in {"[SECRET]"}):
                     continue
                 langs = self.languages(part)
+                if not langs:
+                    matches.append(RecognizerResult("LANGUAGE_UNSUPPORTED", unit.start(), unit.end(), 1.0))
+                    continue
                 if "en" in langs:
                     mapping = {"PERSON": "PERSON", "ORG": "ORGANIZATION",
                                "GPE": "LOCATION", "LOC": "LOCATION", "FAC": "LOCATION",

@@ -32,9 +32,14 @@ class SingleNotePolicy:
     access_mode: str = "single_note"
     content_mode: str = "blocked"
     mask_dates: bool = True
+    languages: tuple[str, ...] = ("en", "tr")
 
     def __post_init__(self):
         try:
+            if (type(self.languages) is not tuple or not self.languages
+                    or any(type(x) is not str or x not in {"en", "tr"} for x in self.languages)
+                    or len(set(self.languages)) != len(self.languages)):
+                raise AccessDenied()
             if type(self.mask_dates) is not bool:
                 raise AccessDenied()
             if self.access_mode not in ("single_note", "denylist") or self.content_mode not in ("blocked", "unredacted", "redacted"):
@@ -68,14 +73,17 @@ class SingleNotePolicy:
 
             data = json.loads(raw, object_pairs_hook=unique_fields)
             if (not isinstance(data, dict)
-                    or not set(data) <= {"allowed_note_id", "blocked_note_ids", "access_mode", "content_mode", "mask_dates"}):
+                    or not set(data) <= {"allowed_note_id", "blocked_note_ids", "access_mode", "content_mode", "mask_dates", "languages"}):
                 raise ValueError
             blocked = data.get("blocked_note_ids", [])
             if type(blocked) is not list or len(blocked) > 16:
                 raise ValueError
+            languages = data.get("languages", ["en", "tr"])
+            if type(languages) is not list:
+                raise ValueError
             return cls(data.get("allowed_note_id"), frozenset(blocked),
                        data.get("access_mode", "single_note"), data.get("content_mode", "blocked"),
-                       data.get("mask_dates", True))
+                       data.get("mask_dates", True), tuple(languages))
         except (OSError, ValueError, TypeError, InvalidPolicy):
             raise InvalidPolicy("Single-note policy is unavailable or invalid.") from None
 

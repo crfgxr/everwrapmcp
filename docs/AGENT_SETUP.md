@@ -24,20 +24,17 @@ report them as successful checks without actual tool evidence.
 
 Ask: “Which languages do your notes contain? Do you mix languages within a note?”
 Offer English, Turkish, both, or another language as conversational answers.
-Use an answer already supplied by the user; do not ask repeatedly. The answer
-is a compatibility check, not a working configuration parameter.
+Use an answer already supplied by the user; do not ask repeatedly. After creating
+or validating the private policy, run `everwrap.setup --languages en`, `--languages tr`,
+or `--languages en tr` using the checkout's Python and PYTHONPATH as shown in INSTALL.md.
+The installer downloads selected packs, runs fictional checks and writes the local
+`languages` setting only after success. Preserve all exclusions and access settings.
+This setting is not a per-request tool argument. Existing policies default to both.
 
-Explain that this release installs both EN/TR models and routes text locally.
-English-only and Turkish-only installation modes are not implemented. Do not add
-an invented `languages` field to the strict policy JSON or tool arguments. Other
-languages are not validated; offer synthetic testing and describe the gap rather
-than claiming that Lingua's full language list is supported masking coverage.
-
-A future language-pack setting should be installation/local policy configuration,
-not a per-request tool argument that lets the assistant weaken protection. Mixed
-notes should be routed automatically, and unsupported-language behavior must be
-explicitly tested before a pack is released. Selection should govern validated
-models and recognizers together, not merely the language identifier.
+Other languages need model/rule integration and tests; Lingua identification alone
+is not masking coverage. Explain this gap if the requested pack is unavailable.
+Unsupported or uncertain passages are withheld, but language detection is fallible.
+Never resolve a coverage failure by disabling masking or removing exclusions.
 
 ## Ask about blocked notes before broader access
 
@@ -58,7 +55,7 @@ block list from no response. A user can explicitly choose no exclusions.
 ## Install and configure
 
 1. Follow the runtime commands in INSTALL.md, including requirements-live.txt and
-   the explicit pinned Turkish model download. `uv sync` can remove the separately
+   the selected language-pack installer after the private policy is valid. `uv sync` can remove the separately
    installed live dependencies; reinstall requirements-live.txt afterward.
 2. For a new installation, request a synthetic Evernote note link/UUID. Use the
    first note UUID from its internal link. Keep it only in the ignored local

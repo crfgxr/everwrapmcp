@@ -107,8 +107,8 @@ def markup_to_text(text):
 
 
 class PresidioRedactor:
-    def __init__(self):
-        import en_core_web_lg
+    def __init__(self, languages=("en", "tr")):
+        import spacy
         from presidio_analyzer import AnalyzerEngine, Pattern, PatternRecognizer
         from presidio_analyzer.nlp_engine import SpacyNlpEngine
         from presidio_anonymizer import AnonymizerEngine
@@ -116,7 +116,12 @@ class PresidioRedactor:
         engine = SpacyNlpEngine(models=[{"lang_code": "en", "model_name": "en_core_web_lg"}])
         # Load an installed package directly. Do not use the provider's automatic
         # download path when a model is absent during a sensitive-content request.
-        engine.nlp = {"en": en_core_web_lg.load()}
+        if "en" in languages:
+            import en_core_web_lg
+            english = en_core_web_lg.load()
+        else:
+            english = spacy.blank("en")
+        engine.nlp = {"en": english}
         self.analyzer = AnalyzerEngine(nlp_engine=engine, supported_languages=["en"])
         for entity, patterns in PATTERNS.items():
             self.analyzer.registry.add_recognizer(PatternRecognizer(
@@ -125,7 +130,7 @@ class PresidioRedactor:
                           for i, pattern in enumerate(patterns)],
             ))
         from .language import LanguageAwareAnalyzer
-        self.analyzer = LanguageAwareAnalyzer(self.analyzer, engine.nlp["en"])
+        self.analyzer = LanguageAwareAnalyzer(self.analyzer, engine.nlp["en"], languages)
         self.anonymizer = AnonymizerEngine()
 
     def sanitize_text(self, text):
@@ -180,11 +185,11 @@ class PresidioRedactor:
         return self.sanitize_text(markup_to_text(text))
 
 
-@lru_cache(maxsize=2)
-def get_redactor(mask_dates=True):
+@lru_cache(maxsize=6)
+def get_redactor(mask_dates=True, languages=("en", "tr")):
     if not mask_dates:
         from copy import copy
-        redactor = copy(get_redactor())
+        redactor = copy(get_redactor(True, languages))
         redactor.mask_dates = False
         return redactor
-    return PresidioRedactor()
+    return PresidioRedactor(languages)

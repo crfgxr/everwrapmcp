@@ -26,7 +26,8 @@ redacted mode. Restart an older server after updating to load this policy option
    Normalize character entities, Unicode compatibility forms, and invisible format
    characters. Run shared Presidio patterns/checksum recognizers across the complete
    window. Route sentence/paragraph units with Lingua to English spaCy or Turkish
-   BERT NER; ambiguous units use both. Turkish inference uses overlapping 400-token
+   BERT NER according to the selected local packs. Unsupported or uncertain units
+   are withheld as `[LANGUAGE_UNSUPPORTED]` (overlaps may become `[REDACTED]`). Turkish inference uses overlapping 400-token
    windows with an 80-token overlap, so long tails are not silently truncated.
 6. Merge overlapping detected spans and use Presidio Anonymizer to replace them
    with typed placeholders. Page only after masking; return only processed text
@@ -54,8 +55,10 @@ text or detected values. Intermediate raw data stays in the wrapper's memory.
 ## Coverage and limits
 
 This is automatic **best-effort masking**, without a human approval step. It uses
-English and Turkish statistical NER with extra bilingual patterns. Language routing
-is restricted to English/Turkish; it does not establish support for other languages.
+Selected English/Turkish statistical NER with extra bilingual patterns. Lingua
+checks its full language set, but only selected English/Turkish packs can produce
+readable output. Purely numeric units still use shared rules and the date preference.
+The language-confidence cutoff is a heuristic, not a calibrated privacy guarantee.
 Mixed-language sentences and short ambiguous text can still be misclassified. Contextual names, unusual addresses, ambiguous birthdays, unfamiliar
 credentials, and encoded/obfuscated forms may be missed. Recognizers also produce
 false positives; conservative label patterns can mask more than the sensitive span.
@@ -71,10 +74,10 @@ removal of PERSON/ORGANIZATION protection was used to improve readability.
 
 The Turkish model is `akdeniz27/bert-base-turkish-cased-ner`, revision
 `99995f7d2be4b3a28c74f0d36ee97f8c04ee0571` (MIT). Install it explicitly with
-`PYTHONPATH=src .venv/bin/python -m everwrap.language`. Runtime loads only local
+the [language-pack installer](INSTALL.md#choose-language-packs). Runtime loads only local
 safetensors weights, forbids remote code, and makes no inference network requests.
 Model artifacts live outside the repository under `~/.cache/everwrap/`.
-English and Turkish models stay resident; first initialization is slower than warm
+Selected models stay resident; first initialization is slower than warm
 requests. There are no additional LLM tokens for this local masking step.
 See [dependency review](DEPENDENCY_SECURITY.md) for the dated audit and its limits.
 
@@ -104,3 +107,14 @@ Ten warm local runs of a short, synthetic Turkish two-sentence passage averaged
 about 50 ms on the development Mac. This excludes model startup, Evernote network
 time and large-note processing; it is not an end-to-end latency promise. Real-note
 search should be repeated after the MCP process is restarted to load the change.
+
+## Configurable language-pack validation
+
+The language-pack update passed 274 current regression tests (excluding the
+separate historical stock-baseline gate). A final 16-test pack suite also passed,
+including two added checks for a policy change during a read and a missing model
+blocking access before any upstream fetch. Coverage includes selected-pack loading,
+English/Turkish fictional names, unsupported French/Spanish passages, numeric dates,
+atomic policy updates preserving exclusions, and setup failure leaving policy intact.
+The installation subprocess is mocked in setup tests; a fresh-machine installation
+and live-note verification are still separate checks. No personal notes are fixtures.
