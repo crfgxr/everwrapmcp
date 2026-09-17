@@ -26,13 +26,6 @@ Evernote → EverWrapMCP on your Mac → your AI assistant
            block + mask
 ```
 
-A synthetic example:
-
-```text
-Before: Talk to Alex Smith about the chatbot.
-After:  Talk to [PERSON] about the chatbot.
-```
-
 **Masking is best-effort.** It can miss sensitive details or mask harmless words.
 Processed text still goes to your AI provider. Local language routing selects English
 or Turkish name detection, alongside shared sensitive-data rules. [See the limits.](docs/REDACTION.md)
@@ -74,6 +67,96 @@ that supports local MCP tools. You supply a dummy note and complete OAuth in you
 browser. A normal web chat cannot install software on your Mac from a repo link.
 The ChatGPT tunnel route below is a separate, unverified advanced setup.
 
+## What onboarding looks like
+
+This is an example conversation, not an automated setup wizard. All note content
+below is invented; none comes from a user's notes.
+
+| Step | Your setup agent asks or explains | Example response |
+| --- | --- | --- |
+| Choose a client | “Which app will you use, and are you on macOS?” | “Claude Desktop on my Mac.” The agent explains that this path is documented but not live verified here. |
+| Check languages | “Which languages are your notes in? Do you mix them?” | “English and Turkish, sometimes together.” Both models are installed in this release. |
+| Start small | “Create a note called Garden demo using the fictional text below, then give me its internal note link.” | The agent configures access to that test note only, with masking enabled. |
+| Connect | “Complete Evernote's read-only sign-in in your browser.” | You approve the connection yourself; you never paste a password or token into chat. |
+| Test | “Let's check a permitted read and a synthetic blocked ID.” | The agent reports what actually passed, or the specific step still incomplete. |
+| Choose wider access later | “Would you like to keep test-note-only access, or configure access to other notes with your private exclusions?” | “Keep test-note-only for now.” Nothing is broadened automatically. |
+
+The agent should reuse answers you already supplied. If your client or language
+is unsupported, it should explain that before claiming setup is complete.
+
+## A fictional note, before and after masking
+
+**Original text without masking** — copy this into your `Garden demo` test note:
+
+```text
+Talk to Alex Smith about the community garden.
+Email alex@example.org.
+password=synthetic-demo-only-927
+Bring seeds and a notebook.
+```
+
+**Masked text returned by the current local redactor:**
+
+```text
+Talk to [PERSON] about the community garden.
+Email [REDACTED].
+[SECRET]
+Bring seeds and a notebook.
+```
+
+This synthetic transformation was checked locally. `[REDACTED]` can mean
+recognizers overlap; placeholder labels are not always `[EMAIL_ADDRESS]`.
+The original note stays unchanged. “Without masking” above is a comparison, not
+an onboarding step that disables protection. No real secret is needed for testing.
+
+A Turkish example, also checked locally:
+
+```text
+Original: Bugün Ayşe Yılmaz ile konuştum.
+          Yarın bahçeye tohum götüreceğim.
+
+Masked:   Bugün [PERSON] ile konuştum.
+          Yarın bahçeye tohum götüreceğim.
+```
+
+## Example prompts and answers
+
+These assistant answers are illustrative, not guaranteed wording or transcripts
+of a live client test. The assistant must base its answer on actual tool results.
+
+**Read your configured test note**
+
+> You: Read my configured Garden demo note through EverWrapMCP. What should I bring?
+>
+> Assistant: Seeds and a notebook. The note also mentions a person and contact
+> details that were masked.
+
+**Ask for something that was masked**
+
+> You: What email address does the Garden demo note contain?
+>
+> Assistant: The returned text masks it, so I can't provide the address.
+
+**Try a blocked note** — use a synthetic blocked UUID in the initial test:
+
+> You: Read this blocked test note through EverWrapMCP.
+>
+> Assistant: The wrapper denied access. No note content was returned.
+
+The assistant should not suggest removing the block or using a direct connector
+to complete that request. It cannot change policy through the read tool.
+
+**Find related ideas** — only after you deliberately enable denylist access:
+
+> You: Find up to three notes about organizing a community garden.
+>
+> Assistant: I found a planting checklist and a saved article about seed sharing.
+> Here's a short summary of each, with source references.
+
+That last answer assumes those fictional results actually exist. With no matching
+results, the assistant should say so. Account-wide search is unavailable in the
+initial single-note mode.
+
 ## Which languages are covered?
 
 During setup, your agent should ask: **“Which languages do your notes contain?
@@ -95,8 +178,7 @@ Optional, separately validated language packs are a planned improvement.
 The README and agent setup path are ready for collaborators to try. Public launch
 still needs repository access to be opened deliberately and a clean-machine
 onboarding test. The code is MIT-licensed; distribution is currently a private
-preview. Only
-Codex has live integration evidence; Claude and ChatGPT remain unverified here.
+preview. Only Codex has live integration evidence; Claude and ChatGPT remain unverified here.
 The privacy model is best-effort masking plus a local block list, not a guarantee
 that every sensitive detail is removed. [Known gaps and priorities](docs/IMPROVEMENTS.md).
 
@@ -129,10 +211,10 @@ tested end-to-end here. [Full installation guide →](docs/INSTALL.md)
 
 ## Try it
 
-> Use EverWrapMCP to find my latest braindumping note and summarize it.
+> Use EverWrapMCP to read the latest dated entry in my garden journal.
 
-> Use EverWrapMCP semantic search to find past notes about feeling stuck in a role
-> that does not fit my strengths. Distinguish my own writing from saved articles.
+> Find notes about keeping a community garden organized. Distinguish my own
+> observations from saved reference articles.
 
 Meaning-based search returns small masked passages before fetching full notes.
 [Semantic search behavior and privacy limits.](docs/SEMANTIC_SEARCH.md)

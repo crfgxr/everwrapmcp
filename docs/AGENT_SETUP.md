@@ -4,6 +4,10 @@ This guide is for a local coding agent helping a new user install EverWrapMCP. R
 [INSTALL.md](INSTALL.md) for commands and client configuration. Do not claim an
 integration is verified until the target client actually calls the wrapper.
 
+Use the [fictional onboarding and before/after examples](../README.md#what-onboarding-looks-like)
+to explain the experience. Example assistant answers are illustrations: never
+report them as successful checks without actual tool evidence.
+
 ## Establish the environment
 
 - Check macOS, repository access, Git, uv and the intended client. Only the Codex
