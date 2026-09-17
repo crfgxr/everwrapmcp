@@ -156,15 +156,10 @@ recognizers overlap; placeholder labels are not always `[EMAIL_ADDRESS]`.
 The original note stays unchanged. “Without masking” above is a comparison, not
 an onboarding step that disables protection. No real secret is needed for testing.
 
-A Turkish example, also checked locally:
-
-```text
-Original: Bugün Ayşe Yılmaz ile konuştum.
-          Yarın bahçeye tohum götüreceğim.
-
-Masked:   Bugün [PERSON] ile konuştum.
-          Yarın bahçeye tohum götüreceğim.
-```
+The examples here are in English. **Masking currently supports English and
+Turkish**, with local language detection; mixed-language notes are included in
+our tests. Additional languages require validated models and rules and are not
+yet supported. [Language coverage](#which-languages-are-covered).
 
 ## Example prompts and answers
 
