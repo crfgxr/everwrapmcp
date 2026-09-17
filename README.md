@@ -34,8 +34,8 @@ After:  Talk to [PERSON] about the chatbot.
 ```
 
 **Masking is best-effort.** It can miss sensitive details or mask harmless words.
-Processed text still goes to your AI provider. English NLP and extra English/Turkish
-patterns are included; a full Turkish NLP model is not. [See the limits.](docs/REDACTION.md)
+Processed text still goes to your AI provider. Local language routing selects English
+or Turkish name detection, alongside shared sensitive-data rules. [See the limits.](docs/REDACTION.md)
 
 ## What is Evernote MCP?
 
@@ -58,6 +58,7 @@ git clone https://github.com/crfgxr/everwrap.git
 cd everwrap
 uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
+PYTHONPATH=src .venv/bin/python -m everwrap.language
 ```
 
 Next, [configure a test note and sign in to Evernote](docs/INSTALL.md#configure-and-sign-in),

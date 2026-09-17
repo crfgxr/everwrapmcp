@@ -2,3 +2,5 @@
 # Kept separate while the offline universal lock cannot resolve Windows wheels.
 mcp==2.2.0
 keyring==25.7.0
+# Patched cryptography floor from the local dependency audit.
+cryptography==50.0.1

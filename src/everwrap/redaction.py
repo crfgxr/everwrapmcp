@@ -1,7 +1,7 @@
 """Local, best-effort Presidio redaction. No remote inference or model downloads.
 
-English statistical NER plus conservative bilingual patterns is NOT a Turkish
-NER model or a guarantee that every sensitive span will be found.
+English and Turkish statistical NER plus bilingual patterns are best-effort,
+not a guarantee that every sensitive span will be found.
 """
 
 from functools import lru_cache
@@ -29,9 +29,6 @@ PATTERNS = {
         r"\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b",
     ],
     "PERSON": [
-        # Unicode title-case pairs also catch common Turkish full names. This
-        # intentionally over-masks some headings; it is a heuristic, not NER.
-        r"(?-i:\b\p{Lu}[\p{Ll}\p{M}'’\-]+(?:[ \t]+\p{Lu}[\p{Ll}\p{M}'’\-]+){1,3}\b)",
         r"\b(?:my name is|adım|ismim)[ \t]+[\p{L}\p{M}'’\-]+(?:[ \t]+[\p{L}\p{M}'’\-]+){0,2}",
         r"(?:^|\n)[ \t]*(?:full name|name|ad soyad|ad[ıi][ \t]+soyad[ıi]|isim|adım|ismim)[ \t]*[:=][ \t]*[^\n;]{1,200}",
     ],
@@ -127,6 +124,8 @@ class PresidioRedactor:
                 patterns=[Pattern(name=f"{entity}_{i}", regex=pattern, score=0.85)
                           for i, pattern in enumerate(patterns)],
             ))
+        from .language import LanguageAwareAnalyzer
+        self.analyzer = LanguageAwareAnalyzer(self.analyzer, engine.nlp["en"])
         self.anonymizer = AnonymizerEngine()
 
     def sanitize_text(self, text):

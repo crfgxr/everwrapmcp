@@ -24,8 +24,10 @@ redacted mode. Restart an older server after updating to load this policy option
    date heading or keywords), retaining neighboring sections for detection context.
    See [large-note selection and pagination](LARGE_NOTES.md).
    Normalize character entities, Unicode compatibility forms, and invisible format
-   characters. Run Presidio Analyzer with the installed English NLP model and
-   supplemental English/Turkish patterns plus credential recognizers.
+   characters. Run shared Presidio patterns/checksum recognizers across the complete
+   window. Route sentence/paragraph units with Lingua to English spaCy or Turkish
+   BERT NER; ambiguous units use both. Turkish inference uses overlapping 400-token
+   windows with an 80-token overlap, so long tails are not silently truncated.
 6. Merge overlapping detected spans and use Presidio Anonymizer to replace them
    with typed placeholders. Page only after masking; return only processed text
    and explicit section/continuation metadata.
@@ -52,16 +54,29 @@ text or detected values. Intermediate raw data stays in the wrapper's memory.
 ## Coverage and limits
 
 This is automatic **best-effort masking**, without a human approval step. It uses
-English statistical NER with extra bilingual patterns, **not a trained Turkish
-NER model**. Contextual names, unusual addresses, ambiguous birthdays, unfamiliar
+English and Turkish statistical NER with extra bilingual patterns. Language routing
+is restricted to English/Turkish; it does not establish support for other languages.
+Mixed-language sentences and short ambiguous text can still be misclassified. Contextual names, unusual addresses, ambiguous birthdays, unfamiliar
 credentials, and encoded/obfuscated forms may be missed. Recognizers also produce
 false positives; conservative label patterns can mask more than the sensitive span.
 Removing detected PII does not remove instructions embedded in note text.
 
-The regression corpus passes 24/26 checks, including removal of all targeted
-sensitive values. The two failures are utility false positives (`asyncio` and a
-harmless Turkish word). Passing fixtures does not guarantee complete privacy.
-The separate stock-baseline report and its six failing tests remain unchanged.
+See [the synthetic report](redaction-results.json) for current fixture results.
+Passing fixtures does not guarantee complete privacy. The separate historical
+stock-baseline report and its six failing tests remain unchanged.
+
+The generic capitalized-words-as-person pattern was removed because it masked
+ordinary headings. Explicit name labels remain. No global confidence increase or
+removal of PERSON/ORGANIZATION protection was used to improve readability.
+
+The Turkish model is `akdeniz27/bert-base-turkish-cased-ner`, revision
+`99995f7d2be4b3a28c74f0d36ee97f8c04ee0571` (MIT). Install it explicitly with
+`PYTHONPATH=src .venv/bin/python -m everwrap.language`. Runtime loads only local
+safetensors weights, forbids remote code, and makes no inference network requests.
+Model artifacts live outside the repository under `~/.cache/everwrap/`.
+English and Turkish models stay resident; first initialization is slower than warm
+requests. There are no additional LLM tokens for this local masking step.
+See [dependency review](DEPENDENCY_SECURITY.md) for the dated audit and its limits.
 
 Run actual engine tests and the synthetic benchmark with:
 
@@ -74,3 +89,18 @@ The report contains synthetic examples only. Do not add real note content,
 identifiers, account links, or the private block list to reports or fixtures.
 
 Presidio reference: https://presidio.dataprivacystack.org/anonymizer/
+
+## Language-routing validation (2026-09-17)
+
+The application regression suite passed 258 tests (historical stock baseline
+excluded). Two additional missing-model/error-sanitization checks also passed;
+the final targeted language suite passed all 14 tests. Tests include ordinary
+Turkish prose, bilingual names, contacts, secrets, addresses, long-token-window
+tails, block-before-fetch, and absence of raw fallback. The synthetic corpus now
+passes 25/26; the remaining false positive masks the programming name `asyncio`.
+Both exploratory name cases pass, without establishing general recall.
+
+Ten warm local runs of a short, synthetic Turkish two-sentence passage averaged
+about 50 ms on the development Mac. This excludes model startup, Evernote network
+time and large-note processing; it is not an end-to-end latency promise. Real-note
+search should be repeated after the MCP process is restarted to load the change.

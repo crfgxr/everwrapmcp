@@ -49,11 +49,11 @@ def run():
     rows = evaluate(redactor, CASES)
     challenges = evaluate(redactor, CHALLENGES)
     report = {
-        "configuration": "Local Presidio + en_core_web_lg + bilingual patterns and credential recognizers",
+        "configuration": "Local Presidio + Lingua EN/TR routing + English spaCy + pinned Turkish BERT + bilingual credential patterns",
         "synthetic_only": True, "guarantees_complete_detection": False,
         "passed": sum(r["passed"] for r in rows), "total": len(rows),
         "results": rows, "exploratory_challenges": challenges,
-        "turkish_statistical_ner": False,
+        "turkish_statistical_ner": True,
     }
     Path("docs/redaction-results.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
     print(json.dumps(report, ensure_ascii=False, indent=2))

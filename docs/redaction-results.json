@@ -1,8 +1,8 @@
 {
-  "configuration": "Local Presidio + en_core_web_lg + bilingual patterns and credential recognizers",
+  "configuration": "Local Presidio + Lingua EN/TR routing + English spaCy + pinned Turkish BERT + bilingual credential patterns",
   "synthetic_only": true,
   "guarantees_complete_detection": false,
-  "passed": 24,
+  "passed": 25,
   "total": 26,
   "results": [
     {
@@ -18,17 +18,17 @@
     {
       "case": "turkish_phone",
       "passed": true,
-      "output": "[NRP]: [REDACTED]"
+      "output": "Telefon: [PHONE_NUMBER]"
     },
     {
       "case": "turkish_person",
       "passed": true,
-      "output": "[PERSON] ile chatbot [ORGANIZATION]."
+      "output": "Yarın [PERSON] ile chatbot projesini konuşacağım."
     },
     {
       "case": "turkish_birthday",
       "passed": true,
-      "output": "[REDACTED]"
+      "output": "[DATE_TIME]"
     },
     {
       "case": "openai_key",
@@ -63,12 +63,12 @@
     {
       "case": "turkish_context_name",
       "passed": true,
-      "output": "[PERSON]. [PERSON]."
+      "output": "[PERSON]. chatbot hazır."
     },
     {
       "case": "unicode_full_name",
       "passed": true,
-      "output": "[PERSON] ile görüşme yapıldı."
+      "output": "[PERSON][PERSON] ile görüşme yapıldı."
     },
     {
       "case": "english_birthday",
@@ -78,7 +78,7 @@
     {
       "case": "turkish_birthday_new",
       "passed": true,
-      "output": "[REDACTED]\nchatbot hazır."
+      "output": "[DATE_TIME]\nchatbot hazır."
     },
     {
       "case": "numeric_date",
@@ -93,7 +93,7 @@
     {
       "case": "turkish_address",
       "passed": true,
-      "output": "[REDACTED]\nchatbot hazır."
+      "output": "[LOCATION]\nchatbot hazır."
     },
     {
       "case": "turkish_password",
@@ -127,8 +127,8 @@
     },
     {
       "case": "turkish_utility",
-      "passed": false,
-      "output": "chatbot [ORGANIZATION] olay tabanlı mimari kullan."
+      "passed": true,
+      "output": "chatbot için olay tabanlı mimari kullan."
     },
     {
       "case": "code_utility",
@@ -140,7 +140,7 @@
     {
       "case": "lowercase_turkish_name",
       "passed": true,
-      "output": "[PERSON]."
+      "output": "bugün [PERSON][PERSON][PERSON] ile konuştum."
     },
     {
       "case": "contextual_single_name",
@@ -148,5 +148,5 @@
       "output": "the person in the blue coat was [PERSON]."
     }
   ],
-  "turkish_statistical_ner": false
+  "turkish_statistical_ner": true
 }

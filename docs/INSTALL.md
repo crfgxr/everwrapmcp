@@ -13,6 +13,7 @@ git clone https://github.com/crfgxr/everwrap.git
 cd everwrap
 uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
+PYTHONPATH=src .venv/bin/python -m everwrap.language
 ```
 
 The project supports Python 3.12–3.13. Model installation downloads public weights;
