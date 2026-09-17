@@ -47,7 +47,12 @@ You need a Mac, an Evernote account with MCP access, and a compatible client.
 | Claude Desktop / Claude Code | [Desktop](docs/INSTALL.md#claude-desktop) / [Code](docs/INSTALL.md#claude-code) · documented, not live tested |
 | ChatGPT cloud chat | [Private tunnel setup](docs/INSTALL.md#chatgpt) · advanced, not live tested |
 
-**[Follow the installation guide →](docs/INSTALL.md)**
+## Follow the installation guide
+
+**[Open the step-by-step installation guide →](docs/INSTALL.md)**
+
+Install the wrapper, choose your private exclusions, sign in to Evernote, and
+connect your client.
 
 Or give a coding agent with local terminal access this setup request:
 
