@@ -47,6 +47,34 @@ search, read, and create notes through an OAuth connection. It is currently in b
 EverWrap connects to that official server with read-only access and adds your
 local block list and masking step before results reach the assistant.
 
+## Let your coding agent set it up
+
+Give an agent with local terminal access this prompt:
+
+> Help me install EverWrap from https://github.com/crfgxr/everwrap on my Mac.
+> Read README.md and docs/AGENT_SETUP.md first. Preserve my existing client
+> configuration and any existing EverWrap privacy policy. Start with a synthetic
+> test note and masking enabled. Guide me through Evernote's read-only sign-in,
+> register only the wrapper, and verify a permitted read and a blocked read.
+> Tell me what passed and what still needs my input. Do not broaden note access
+> or connect directly to Evernote to work around a failure.
+
+**Today this is an agent-assisted experiment, not a one-click install.** The agent
+needs access to this private repository, a local terminal on macOS, and a client
+that supports local MCP tools. You supply a dummy note and complete OAuth in your
+browser. A normal web chat cannot install software on your Mac from a repo link.
+The ChatGPT tunnel route below is a separate, unverified advanced setup.
+
+## Sharing status
+
+The README and agent setup path are ready for collaborators to try. Public launch
+still needs repository access to be opened deliberately, an explicit project
+license, and a clean-machine onboarding test. No project license is included yet;
+this is currently a private preview, not a released open-source package. Only
+Codex has live integration evidence; Claude and ChatGPT remain unverified here.
+The privacy model is best-effort masking plus a local block list, not a guarantee
+that every sensitive detail is removed. [Known gaps and priorities](docs/IMPROVEMENTS.md).
+
 ## Install in your client
 
 You'll need macOS, Git, [uv](https://docs.astral.sh/uv/getting-started/installation/),
