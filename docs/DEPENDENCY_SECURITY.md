@@ -1,6 +1,6 @@
 # Dependency review — 2026-09-17
 
-EverWrap-MCP is Python, not npm. No npm package was added. We checked the actual
+EverWrap MCP is Python, not npm. No npm package was added. We checked the actual
 Python dependency graph with pip-audit 2.10.1 against its default PyPI advisory
 service. [Machine-readable installed-environment report](dependency-audit.json).
 

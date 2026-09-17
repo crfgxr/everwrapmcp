@@ -1,6 +1,6 @@
 # Large notes: local selection, bounded masked output
 
-EverWrap-MCP previously rejected note bodies above 100,000 characters, including
+EverWrap MCP previously rejected note bodies above 100,000 characters, including
 formatting. That arbitrary whole-note bound is replaced in **redacted mode** by
 local section selection and masked pages. The block list always wins, before fetch.
 
@@ -86,5 +86,5 @@ not a universal latency benchmark. Startup and Evernote network time are exclude
 model load time is reported separately. Output character counts are measured;
 model-token counts are not.
 
-After updating an installation, restart its EverWrap-MCP connection/client so
+After updating an installation, restart its EverWrap MCP connection/client so
 it loads the new tool schema and server code.
