@@ -5,7 +5,7 @@
 EverWrapMCP gives you two controls over what your AI assistant receives from Evernote:
 a private note block list and local masking of detected sensitive data.
 
-**Private preview · macOS · read-only · experimental**
+**Public experiment · MIT licensed · macOS · read-only**
 
 ## The problem
 
@@ -62,7 +62,7 @@ Give an agent with local terminal access this prompt:
 > or connect directly to Evernote to work around a failure.
 
 **Today this is an agent-assisted experiment, not a one-click install.** The agent
-needs access to this private repository, a local terminal on macOS, and a client
+needs a local terminal on macOS and a client
 that supports local MCP tools. You supply a dummy note and complete OAuth in your
 browser. A normal web chat cannot install software on your Mac from a repo link.
 The ChatGPT tunnel route below is a separate, unverified advanced setup.
@@ -222,18 +222,17 @@ Optional, separately validated language packs are a planned improvement.
 
 ## Sharing status
 
-The README and agent setup path are ready for collaborators to try. Public launch
-still needs repository access to be opened deliberately and a clean-machine
-onboarding test. The code is MIT-licensed; distribution is currently a private
-preview. Only Codex has live integration evidence; Claude and ChatGPT remain unverified here.
+The repository is public and MIT-licensed. Anyone can read or clone it; this is
+still an experimental project. A clean-machine onboarding test remains outstanding.
+Only Codex has live integration evidence; Claude and ChatGPT remain unverified here.
 The privacy model is best-effort masking plus a local block list, not a guarantee
 that every sensitive detail is removed. [Known gaps and priorities](docs/IMPROVEMENTS.md).
 
 ## Install in your client
 
 You'll need macOS, Git, [uv](https://docs.astral.sh/uv/getting-started/installation/),
-and an Evernote account with MCP access. This repository is currently private;
-cloning requires GitHub access.
+and an Evernote account with MCP access. The public repository can be cloned
+without collaborator access.
 
 ```sh
 git clone https://github.com/crfgxr/everwrapmcp.git

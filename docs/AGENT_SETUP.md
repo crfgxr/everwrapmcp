@@ -17,8 +17,8 @@ report them as successful checks without actual tool evidence.
   paths for client registration. Do not put a checkout in a disposable temp folder.
 - Inspect existing configuration before changing it. Merge the EverWrapMCP entry;
   preserve unrelated servers and never overwrite an existing private policy.
-- The repository is currently private; its original code is MIT-licensed. Do not
-  change visibility or claim it is a released public package.
+- The repository is public and its original code is MIT-licensed. It is still
+  experimental; do not claim a packaged one-click release exists.
 
 ## Ask about note languages
 
@@ -102,10 +102,9 @@ provider. Keep actual note IDs, note text and private policies out of commits,
 issues and shared installation reports. Use the user's real-note scope only when
 explicitly established; installation is not an account-wide retrieval request.
 
-## Before a public launch
+## Before promoting broader adoption
 
 The project MIT license is in place. Review dependencies/model licenses;
 review tracked files and Git history for private data; verify a fresh macOS
-installation from the documented commands; then deliberately decide repository
-visibility. Test other clients before promoting them as working integrations.
+installation from the documented commands. Repository visibility is already public. Test other clients before promoting them as working integrations.
 These release steps are not performed merely by following this setup guide.

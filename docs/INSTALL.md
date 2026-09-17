@@ -2,7 +2,7 @@
 
 EverWrapMCP currently runs on **macOS** and uses macOS Keychain for Evernote credentials.
 Windows/Linux and a one-click extension package are not supported by this build.
-The repository is private; collaborators need GitHub access before cloning.
+The repository is public and MIT-licensed; collaborator access is not required.
 
 Not sure which client path you need? Read [the compatibility guide](CLIENT_COMPATIBILITY.md).
 Codex is optional; ordinary ChatGPT cloud chat does not inherit local MCP registration.
