@@ -83,6 +83,11 @@ tested end-to-end here. [Full installation guide →](docs/INSTALL.md)
 Meaning-based search returns small masked passages before fetching full notes.
 [Semantic search behavior and privacy limits.](docs/SEMANTIC_SEARCH.md)
 
+EverWrap guides the client to use semantic search for themes and coaching,
+keyword search for exact matches and filters, and direct reads for known notes
+or their latest dated entries. It does not automatically run all three.
+[Tool selection and examples.](docs/RETRIEVAL.md)
+
 Start with the synthetic test note before expanding access. Connect **EverWrap**
 and remove any direct Evernote connector if you want requests to use the wrapper.
 Your private block list and OAuth credentials stay out of the repository.
