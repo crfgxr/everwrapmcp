@@ -37,6 +37,16 @@ After:  Talk to [PERSON] about the chatbot.
 Processed text still goes to your AI provider. English NLP and extra English/Turkish
 patterns are included; a full Turkish NLP model is not. [See the limits.](docs/REDACTION.md)
 
+## What is Evernote MCP?
+
+MCP stands for **Model Context Protocol**, a standard for connecting AI assistants
+to tools and data. Evernote's official MCP server lets compatible assistants
+search, read, and create notes through an OAuth connection. It is currently in beta.
+[Read Evernote's official MCP guide.](https://dev.evernote.com/mcp)
+
+EverWrap connects to that official server with read-only access and adds your
+local block list and masking step before results reach the assistant.
+
 ## Install in your client
 
 You'll need macOS, Git, [uv](https://docs.astral.sh/uv/getting-started/installation/),
