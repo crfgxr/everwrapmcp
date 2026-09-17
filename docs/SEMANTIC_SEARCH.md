@@ -1,10 +1,10 @@
-# Meaning-based search through EverWrap MCP
+# Meaning-based search through EverWrapMCP
 
 `semantic_search_safe_notes` uses Evernote's own semantic search to retrieve
 related passages without downloading complete notes. It returns a bounded set
 of masked snippets and routing IDs, not an answer, a graph, or a complete history.
 
-Example: ask EverWrap MCP to find past notes about feeling stuck in a role that does
+Example: ask EverWrapMCP to find past notes about feeling stuck in a role that does
 not fit your strengths. Different wording and languages can produce different
 results. Relevant saved articles are not necessarily your own experiences.
 
@@ -59,7 +59,7 @@ same sanitizer. The wrapper does not request attachments separately.
 - English and Turkish live queries both returned results; that is a smoke test,
   not a measured cross-language relevance benchmark. Turkish text may be heavily
   over-masked by the current English NLP model and bilingual heuristics.
-- The block list controls export through EverWrap MCP. Evernote may already index
+- The block list controls export through EverWrapMCP. Evernote may already index
   blocked notes on its own servers; local filtering cannot undo that indexing.
 - Detection remains best-effort. No raw fallback, graph, or persistent note index
   is introduced by this feature.
