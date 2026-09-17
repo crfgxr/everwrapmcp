@@ -60,7 +60,8 @@ chat the GitHub URL does not install or connect it.
 Give an agent with local terminal access this prompt:
 
 > Help me install EverWrapMCP from https://github.com/crfgxr/everwrapmcp on my Mac.
-> Read README.md and docs/AGENT_SETUP.md first. Preserve my existing client
+> Read README.md and docs/AGENT_SETUP.md first. Ask which languages my notes
+> contain, including mixed-language notes, and explain current coverage. Preserve my existing client
 > configuration and any existing EverWrapMCP privacy policy. Start with a synthetic
 > test note and masking enabled. Guide me through Evernote's read-only sign-in,
 > register only the wrapper, and verify a permitted read and a blocked read.
@@ -72,6 +73,22 @@ needs access to this private repository, a local terminal on macOS, and a client
 that supports local MCP tools. You supply a dummy note and complete OAuth in your
 browser. A normal web chat cannot install software on your Mac from a repo link.
 The ChatGPT tunnel route below is a separate, unverified advanced setup.
+
+## Which languages are covered?
+
+During setup, your agent should ask: **“Which languages do your notes contain?
+Do you mix languages within a note?”** This is about the notes, not the language
+you use to chat with your assistant.
+
+The current release installs **English and Turkish together** and detects which
+to use locally. You do not have to choose a language for every search. There is
+no configurable language-pack selector yet; answering the setup question does
+not change the installed models or guarantee protection in other languages.
+
+If your notes include another language, the agent should explain that its masking
+has not been validated and should not enable broader access on the assumption
+that language identification is enough. Keep initial testing to a synthetic note.
+Optional, separately validated language packs are a planned improvement.
 
 ## Sharing status
 

@@ -16,6 +16,25 @@ integration is verified until the target client actually calls the wrapper.
 - The repository is currently private; its original code is MIT-licensed. Do not
   change visibility or claim it is a released public package.
 
+## Ask about note languages
+
+Ask: “Which languages do your notes contain? Do you mix languages within a note?”
+Offer English, Turkish, both, or another language as conversational answers.
+Use an answer already supplied by the user; do not ask repeatedly. The answer
+is a compatibility check, not a working configuration parameter.
+
+Explain that this release installs both EN/TR models and routes text locally.
+English-only and Turkish-only installation modes are not implemented. Do not add
+an invented `languages` field to the strict policy JSON or tool arguments. Other
+languages are not validated; offer synthetic testing and describe the gap rather
+than claiming that Lingua's full language list is supported masking coverage.
+
+A future language-pack setting should be installation/local policy configuration,
+not a per-request tool argument that lets the assistant weaken protection. Mixed
+notes should be routed automatically, and unsupported-language behavior must be
+explicitly tested before a pack is released. Selection should govern validated
+models and recognizers together, not merely the language identifier.
+
 ## Install and configure
 
 1. Follow the runtime commands in INSTALL.md, including requirements-live.txt and
