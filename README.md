@@ -1,8 +1,8 @@
-# EverWrap
+# EverWrap-MCP
 
 **Take control of your notes: block private notes and mask sensitive data.**
 
-EverWrap gives you two controls over what your AI assistant receives from Evernote:
+EverWrap-MCP gives you two controls over what your AI assistant receives from Evernote:
 a private note block list and local masking of detected sensitive data.
 
 **Private preview · macOS · read-only · experimental**
@@ -14,7 +14,7 @@ to share, but contain names, contact details, or secrets you want masked.
 
 ## The solution
 
-EverWrap sits between your AI client and Evernote, applying two checks:
+EverWrap-MCP sits between your AI client and Evernote, applying two checks:
 
 - **Block whole notes.** Your private block list excludes selected notes from returned reads and search results.
 - **Mask sensitive parts.** For allowed notes, local Presidio processing replaces detected sensitive text in titles, bodies, and search snippets.
@@ -22,7 +22,7 @@ EverWrap sits between your AI client and Evernote, applying two checks:
 You get the remaining text to work with. Your original Evernote notes stay unchanged.
 
 ```text
-Evernote → EverWrap on your Mac → your AI assistant
+Evernote → EverWrap-MCP on your Mac → your AI assistant
            block + mask
 ```
 
@@ -44,14 +44,14 @@ to tools and data. Evernote's official MCP server lets compatible assistants
 search, read, and create notes through an OAuth connection. It is currently in beta.
 [Read Evernote's official MCP guide.](https://dev.evernote.com/mcp)
 
-EverWrap connects to that official server with read-only access and adds your
+EverWrap-MCP connects to that official server with read-only access and adds your
 local block list and masking step before results reach the assistant.
 
 ## Do I need Codex?
 
-**No.** EverWrap is an MCP wrapper, not a Codex-only feature. Claude Desktop can
+**No.** EverWrap-MCP is an MCP wrapper, not a Codex-only feature. Claude Desktop can
 use local MCP servers; ChatGPT cloud chat needs a separate tunnel or remote
-connection. Only Codex has been tested live with EverWrap so far. Giving a regular
+connection. Only Codex has been tested live with EverWrap-MCP so far. Giving a regular
 chat the GitHub URL does not install or connect it.
 [ChatGPT vs Claude vs Codex: setup paths and evidence](docs/CLIENT_COMPATIBILITY.md).
 
@@ -59,9 +59,9 @@ chat the GitHub URL does not install or connect it.
 
 Give an agent with local terminal access this prompt:
 
-> Help me install EverWrap from https://github.com/crfgxr/everwrap on my Mac.
+> Help me install EverWrap-MCP from https://github.com/crfgxr/everwrap-mcp on my Mac.
 > Read README.md and docs/AGENT_SETUP.md first. Preserve my existing client
-> configuration and any existing EverWrap privacy policy. Start with a synthetic
+> configuration and any existing EverWrap-MCP privacy policy. Start with a synthetic
 > test note and masking enabled. Guide me through Evernote's read-only sign-in,
 > register only the wrapper, and verify a permitted read and a blocked read.
 > Tell me what passed and what still needs my input. Do not broaden note access
@@ -90,8 +90,8 @@ and an Evernote account with MCP access. This repository is currently private;
 cloning requires GitHub access.
 
 ```sh
-git clone https://github.com/crfgxr/everwrap.git
-cd everwrap
+git clone https://github.com/crfgxr/everwrap-mcp.git
+cd everwrap-mcp
 uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
 PYTHONPATH=src .venv/bin/python -m everwrap.language
@@ -112,20 +112,20 @@ tested end-to-end here. [Full installation guide →](docs/INSTALL.md)
 
 ## Try it
 
-> Use EverWrap to find my latest braindumping note and summarize it.
+> Use EverWrap-MCP to find my latest braindumping note and summarize it.
 
-> Use EverWrap semantic search to find past notes about feeling stuck in a role
+> Use EverWrap-MCP semantic search to find past notes about feeling stuck in a role
 > that does not fit my strengths. Distinguish my own writing from saved articles.
 
 Meaning-based search returns small masked passages before fetching full notes.
 [Semantic search behavior and privacy limits.](docs/SEMANTIC_SEARCH.md)
 
-EverWrap guides the client to use semantic search for themes and coaching,
+EverWrap-MCP guides the client to use semantic search for themes and coaching,
 keyword search for exact matches and filters, and direct reads for known notes
 or their latest dated entries. It does not automatically run all three.
 [Tool selection and examples.](docs/RETRIEVAL.md)
 
-Start with the synthetic test note before expanding access. Connect **EverWrap**
+Start with the synthetic test note before expanding access. Connect **EverWrap-MCP**
 and remove any direct Evernote connector if you want requests to use the wrapper.
 Your private block list and OAuth credentials stay out of the repository.
 
@@ -143,9 +143,13 @@ Independent prototype; not affiliated with Evernote. This is not an OS security 
 
 [Improvement priorities, duplication, and open questions](docs/IMPROVEMENTS.md).
 
+The product and repository are named **EverWrap-MCP** (`everwrap-mcp`). The Python
+module and MCP registration key remain `everwrap` for compatibility with existing
+installations. Existing checkout folders do not need to be renamed.
+
 ## License
 
-EverWrap’s original code and documentation are available under the [MIT License](LICENSE).
+EverWrap-MCP’s original code and documentation are available under the [MIT License](LICENSE).
 You may use, modify and redistribute them, including commercially, while retaining
 the license notice. Third-party packages and model weights retain their own licenses;
 Evernote service access is separate.

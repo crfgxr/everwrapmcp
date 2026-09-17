@@ -1,6 +1,6 @@
-# Install EverWrap
+# Install EverWrap-MCP
 
-EverWrap currently runs on **macOS** and uses macOS Keychain for Evernote credentials.
+EverWrap-MCP currently runs on **macOS** and uses macOS Keychain for Evernote credentials.
 Windows/Linux and a one-click extension package are not supported by this build.
 The repository is private; collaborators need GitHub access before cloning.
 
@@ -12,8 +12,8 @@ Codex is optional; ordinary ChatGPT cloud chat does not inherit local MCP regist
 Install Git and [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
 
 ```sh
-git clone https://github.com/crfgxr/everwrap.git
-cd everwrap
+git clone https://github.com/crfgxr/everwrap-mcp.git
+cd everwrap-mcp
 uv sync --python 3.12
 uv pip install --python .venv/bin/python -r requirements-live.txt
 PYTHONPATH=src .venv/bin/python -m everwrap.language
@@ -70,17 +70,17 @@ absolute paths with your checkout location. You can run `pwd -P` there to find i
 {
   "mcpServers": {
     "everwrap": {
-      "command": "/ABSOLUTE/PATH/everwrap/.venv/bin/python",
+      "command": "/ABSOLUTE/PATH/everwrap-mcp/.venv/bin/python",
       "args": ["-m", "everwrap.server"],
       "env": {
-        "PYTHONPATH": "/ABSOLUTE/PATH/everwrap/src"
+        "PYTHONPATH": "/ABSOLUTE/PATH/everwrap-mcp/src"
       }
     }
   }
 }
 ```
 
-Save and fully quit/reopen Claude Desktop. Check that EverWrap exposes
+Save and fully quit/reopen Claude Desktop. Check that EverWrap-MCP exposes
 `read_safe_note` and `search_safe_notes`. This is local developer configuration,
 not an extension-directory listing or a remote connector URL.
 [Official local-server instructions](https://modelcontextprotocol.io/docs/develop/connect-local-servers).
@@ -89,7 +89,7 @@ integration has not been tested in a live Claude session.
 
 ## Claude Code
 
-With Claude Code installed, run from the EverWrap checkout:
+With Claude Code installed, run from the EverWrap-MCP checkout:
 
 ```sh
 claude mcp add --transport stdio --scope user everwrap --env "PYTHONPATH=$PWD/src" -- "$PWD/.venv/bin/python" -m everwrap.server
@@ -102,23 +102,23 @@ remains outstanding.
 
 ## ChatGPT
 
-**Advanced; not yet tested with EverWrap.** ChatGPT can reach local stdio servers
+**Advanced; not yet tested with EverWrap-MCP.** ChatGPT can reach local stdio servers
 through [Secure MCP Tunnel](https://developers.openai.com/api/docs/guides/secure-mcp-tunnels).
-EverWrap does not provide a public HTTP endpoint.
+EverWrap-MCP does not provide a public HTTP endpoint.
 
 1. In [Platform tunnel settings](https://platform.openai.com/settings/organization/tunnels),
    create a tunnel associated with your ChatGPT workspace. Obtain the necessary
    tunnel permissions, runtime API key, and `tunnel_id`.
 2. Install `tunnel-client` using the download linked in those settings. Supply
    `CONTROL_PLANE_API_KEY` in your shell; don't commit it. On the same Mac where
-   EverWrap is authenticated, replace the ID and paths below:
+   EverWrap-MCP is authenticated, replace the ID and paths below:
 
 ```sh
 tunnel-client init \
   --sample sample_mcp_stdio_local \
   --profile everwrap \
   --tunnel-id YOUR_TUNNEL_ID \
-  --mcp-command '/usr/bin/env "PYTHONPATH=/ABSOLUTE/PATH/everwrap/src" "/ABSOLUTE/PATH/everwrap/.venv/bin/python" -m everwrap.server'
+  --mcp-command '/usr/bin/env "PYTHONPATH=/ABSOLUTE/PATH/everwrap-mcp/src" "/ABSOLUTE/PATH/everwrap-mcp/.venv/bin/python" -m everwrap.server'
 
 tunnel-client doctor --profile everwrap --explain
 tunnel-client run --profile everwrap
@@ -134,7 +134,7 @@ Keep that process running. The tunnel setup above follows OpenAI's
    account and workspace policy.
    [Official connection steps](https://developers.openai.com/plugins/deploy/connect-chatgpt).
 
-Use the EverWrap process as the tunnel target. Pointing ChatGPT directly at the
+Use the EverWrap-MCP process as the tunnel target. Pointing ChatGPT directly at the
 Evernote MCP endpoint bypasses this wrapper's block list and redaction.
 
 ## Codex
@@ -152,13 +152,13 @@ have been verified in this project. This is separate from ChatGPT's tunnel setup
 
 Ask your client:
 
-> Use EverWrap to read my synthetic test note by its configured GUID. Summarize
+> Use EverWrap-MCP to read my synthetic test note by its configured GUID. Summarize
 > the returned text and tell me whether it contains masking placeholders.
 
 Confirm that the returned `content_mode` is `redacted` and the note body is plain
 text. Test a blocked ID too: it should return a static policy denial. No request
 should fetch the blocked note's body. Search may receive blocked metadata locally;
-EverWrap discards that row before returning anything to the assistant.
+EverWrap-MCP discards that row before returning anything to the assistant.
 
 ## Allow more notes
 

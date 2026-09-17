@@ -1,20 +1,20 @@
 # ChatGPT, Claude and Codex: which setup works?
 
 Researched against official documentation on 2026-09-17. Platform capabilities
-below are distinct from integrations actually tested with EverWrap.
+below are distinct from integrations actually tested with EverWrap-MCP.
 
 **Codex is not required. A repository link alone is not an installed connection.**
 An agent with local terminal access can assist with installation; ordinary chat
 can explain the steps but does not automatically run a persistent service on the
-user's computer. EverWrap currently runs on macOS with credentials in Keychain.
+user's computer. EverWrap-MCP currently runs on macOS with credentials in Keychain.
 
-| User's client | Connection path | EverWrap status |
+| User's client | Connection path | EverWrap-MCP status |
 | --- | --- | --- |
 | Codex local | Local stdio MCP registration | Live tested |
-| Claude Desktop chat on Mac | Local MCP configuration; a desktop extension could simplify installation later | Manual setup documented; not live tested; no EverWrap extension bundle yet |
+| Claude Desktop chat on Mac | Local MCP configuration; a desktop extension could simplify installation later | Manual setup documented; not live tested; no EverWrap-MCP extension bundle yet |
 | Claude Code on Mac | Local stdio MCP registration | Documented; not live tested |
-| ChatGPT cloud chat | Private Secure MCP Tunnel to the local wrapper, or an authenticated public HTTPS MCP service | Tunnel setup documented; not live tested; no hosted EverWrap service |
-| Claude web/mobile or cloud remote connector | Authenticated, internet-reachable remote MCP endpoint | Not implemented/tested as an EverWrap deployment |
+| ChatGPT cloud chat | Private Secure MCP Tunnel to the local wrapper, or an authenticated public HTTPS MCP service | Tunnel setup documented; not live tested; no hosted EverWrap-MCP service |
+| Claude web/mobile or cloud remote connector | Authenticated, internet-reachable remote MCP endpoint | Not implemented/tested as an EverWrap-MCP deployment |
 
 ## ChatGPT: additional connection setup
 
@@ -35,8 +35,8 @@ working local configuration makes a cloud ChatGPT chat connected.
 ## Claude: desktop is different from web
 
 Claude Desktop supports local MCP servers, including installable desktop
-extensions. That fits EverWrap's local architecture, but we have not produced an
-EverWrap `.mcpb` bundle or verified the documented manual configuration live.
+extensions. That fits EverWrap-MCP's local architecture, but we have not produced an
+EverWrap-MCP `.mcpb` bundle or verified the documented manual configuration live.
 [Official local-server guide](https://support.claude.com/en/articles/10949351-getting-started-with-local-mcp-servers-on-claude-desktop).
 
 Claude remote connectors originate from Anthropic's cloud, even when configured
@@ -56,7 +56,7 @@ configuration is a separate mechanism, not a way to enable claude.ai or mobile.
    isolation, authentication, storage/retention controls and operating costs.
    Current macOS Keychain code is not a multi-user cloud deployment.
 
-For sharing today, describe EverWrap as a local experimental MCP wrapper, live
+For sharing today, describe EverWrap-MCP as a local experimental MCP wrapper, live
 verified with Codex, with other-client setup guides awaiting validation. Do not
 advertise “paste into ChatGPT and it works.” Researching these routes has not
 installed a tunnel, exposed a server or changed repository visibility.

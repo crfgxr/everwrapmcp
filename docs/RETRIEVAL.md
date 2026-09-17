@@ -1,6 +1,6 @@
 # Choosing the right retrieval tool
 
-EverWrap exposes three tools. Their descriptions and MCP server instructions
+EverWrap-MCP exposes three tools. Their descriptions and MCP server instructions
 explain which to choose; the client model makes the decision. There is no hidden
 server-side classifier, automatic fan-out, or promise that every client obeys
 these instructions. Access control and masking are enforced in server code.

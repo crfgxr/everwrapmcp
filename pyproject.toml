@@ -3,7 +3,7 @@ name = "everwrap"
 version = "0.0.1"
 license = "MIT"
 license-files = ["LICENSE"]
-description = "Local privacy boundary for Evernote MCP — synthetic feasibility study"
+description = "EverWrap-MCP: local note blocking and sensitive-data masking for Evernote MCP"
 requires-python = ">=3.12,<3.14"
 dependencies = [
     "en-core-web-lg",

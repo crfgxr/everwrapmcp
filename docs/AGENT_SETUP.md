@@ -1,6 +1,6 @@
 # Agent-assisted setup
 
-This guide is for a local coding agent helping a new user install EverWrap. Read
+This guide is for a local coding agent helping a new user install EverWrap-MCP. Read
 [INSTALL.md](INSTALL.md) for commands and client configuration. Do not claim an
 integration is verified until the target client actually calls the wrapper.
 
@@ -11,7 +11,7 @@ integration is verified until the target client actually calls the wrapper.
   another client or expose a public server to make an unsupported setup work.
 - Use a stable checkout location chosen with the user's context. Record absolute
   paths for client registration. Do not put a checkout in a disposable temp folder.
-- Inspect existing configuration before changing it. Merge the EverWrap entry;
+- Inspect existing configuration before changing it. Merge the EverWrap-MCP entry;
   preserve unrelated servers and never overwrite an existing private policy.
 - The repository is currently private; its original code is MIT-licensed. Do not
   change visibility or claim it is a released public package.
@@ -32,7 +32,7 @@ integration is verified until the target client actually calls the wrapper.
    and consent. Do not request credentials in chat, copy tokens into configuration,
    or print Keychain contents. Never authenticate a direct Evernote connector as a
    fallback for the wrapper.
-5. Register EverWrap using the chosen client's instructions and absolute paths.
+5. Register EverWrap-MCP using the chosen client's instructions and absolute paths.
    Confirm which reload/restart action is available; do not invent an MCP restart
    command. If another direct Evernote route exists, explain that it bypasses the
    wrapper and help the user disable it within their authorized setup scope.
