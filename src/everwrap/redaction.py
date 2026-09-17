@@ -1,6 +1,6 @@
 """Local, best-effort Presidio redaction. No remote inference or model downloads.
 
-English and Turkish statistical NER plus bilingual patterns are best-effort,
+Selected local statistical NER plus multilingual patterns are best-effort,
 not a guarantee that every sensitive span will be found.
 """
 
@@ -15,13 +15,16 @@ from .service import ProcessingBlocked
 MAX_TEXT = 100_000
 MONTHS = (r"January|February|March|April|May|June|July|August|September|October|November|December|"
           r"Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec|"
-          r"Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık")
+          r"Ocak|Şubat|Mart|Nisan|Mayıs|Haziran|Temmuz|Ağustos|Eylül|Ekim|Kasım|Aralık|"
+          r"enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|"
+          r"janvier|février|mars|avril|mai|juin|juillet|août|septembre|octobre|novembre|décembre|"
+          r"Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember")
 
 # Matched spans are passed through Presidio's anonymizer, never manually removed
 # from only one output surface. High-recall label patterns may mask extra text.
 PATTERNS = {
     "SECRET": [
-        r'''\b(?:[A-Z][A-Z0-9_]*(?:API_KEY|TOKEN|PASSWORD|SECRET)|api[_ -]?key|access[_ -]?token|refresh[_ -]?token|password|passwd|pwd|secret|token|şifre|sifre|parola|api[ \t]+anahtarı)[ \t]*[=:][ \t]*(?:"[^"\n]*"|'[^'\n]*'|[^\s;,]+)''',
+        r'''\b(?:[A-Z][A-Z0-9_]*(?:API_KEY|TOKEN|PASSWORD|SECRET)|api[_ -]?key|access[_ -]?token|refresh[_ -]?token|password|passwd|pwd|secret|token|contraseña|contrasena|mot[ \t]+de[ \t]+passe|passwort|şifre|sifre|parola|api[ \t]+anahtarı)[ \t]*[=:][ \t]*(?:"[^"\n]*"|'[^'\n]*'|[^\s;,]+)''',
         r"\b(?:Bearer|Basic)[ \t]+[A-Za-z0-9._~+/=-]+",
         r"\b(?:sk-(?:proj-|ant-)?[A-Za-z0-9_-]{8,}|gh[pousr]_[A-Za-z0-9_]{12,}|github_pat_[A-Za-z0-9_]{12,}|AKIA[A-Z0-9]{16})\b",
         r"\b[a-z][a-z0-9+.-]*://[^\s/@:]+:[^\s/@]+@[^\s]+",
@@ -30,16 +33,20 @@ PATTERNS = {
     ],
     "PERSON": [
         r"\b(?:my name is|adım|ismim)[ \t]+[\p{L}\p{M}'’\-]+(?:[ \t]+[\p{L}\p{M}'’\-]+){0,2}",
-        r"(?:^|\n)[ \t]*(?:full name|name|ad soyad|ad[ıi][ \t]+soyad[ıi]|isim|adım|ismim)[ \t]*[:=][ \t]*[^\n;]{1,200}",
+        r"(?:^|\n)[ \t]*(?:full name|name|nombre(?:[ \t]+completo)?|nom(?:[ \t]+complet)?|vollständiger[ \t]+name|ad soyad|ad[ıi][ \t]+soyad[ıi]|isim|adım|ismim)[ \t]*[:=][ \t]*[^\n;]{1,200}",
+    ],
+    "PHONE_NUMBER": [
+        r"\b(?:teléfono|telefono|téléphone|telephone|telefon|handy|móvil|mobile)[ \t]*[:=][ \t]*\+?(?:\d[ \t().-]*){6,15}\d\b",
     ],
     "DATE_TIME": [
+        rf"\b\d{{1,2}}(?:\.|[ \t]+de)?[ \t]+(?:{MONTHS})(?:[ \t]+(?:de[ \t]+)?\d{{4}})?\b",
         rf"\b\d{{1,2}}[ \t]+(?:{MONTHS})(?:[ \t]+\d{{4}})?\b",
         rf"\b(?:{MONTHS})[ \t]+\d{{1,2}}(?:st|nd|rd|th)?(?:,?[ \t]+\d{{4}})?\b",
         r"\b(?:\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4})\b",
-        r"\b(?:birthday|date of birth|dob|born on|doğum[ \t]+(?:günüm|günü|tarihim|tarihi))[ \t]*[:=]?[ \t]*[^\n;]{1,100}",
+        r"\b(?:birthday|date of birth|dob|born on|fecha[ \t]+de[ \t]+nacimiento|cumpleaños|date[ \t]+de[ \t]+naissance|anniversaire|geburtsdatum|geburtstag|doğum[ \t]+(?:günüm|günü|tarihim|tarihi))[ \t]*[:=]?[ \t]*[^\n;]{1,100}",
     ],
     "LOCATION": [
-        r"(?:^|\n)[ \t]*(?:home address|postal address|address|adres|ev adresi|adresim)[ \t]*[:=][ \t]*[^\n;]{1,300}",
+        r"(?:^|\n)[ \t]*(?:home address|postal address|address|dirección(?:[ \t]+postal)?|domicilio|adresse(?:[ \t]+postale)?|anschrift|wohnadresse|adres|ev adresi|adresim)[ \t]*[:=][ \t]*[^\n;]{1,300}",
         r"\b\d{1,6}[ \t]+(?:[\p{L}\d.'’\-]+[ \t]+){0,7}(?:Street|St|Road|Rd|Avenue|Ave|Lane|Ln|Drive|Dr|Boulevard|Blvd)\b[^\n;]{0,120}",
         r"\b[\p{L}'’\-]+(?:[ \t]+[\p{L}'’\-]+){0,3}[ \t]+(?:Mahallesi|Mah\.|Caddesi|Cad\.|Sokağı|Sok\.)[^\n;]{0,200}",
     ],

@@ -354,11 +354,27 @@ wheels = [
 ]
 
 [[package]]
+name = "de-core-news-md"
+version = "3.8.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl" }
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl", hash = "sha256:b903f59220f1e76dd672acdaa7fa454d6703fe056c5ccd6457820e70874116d0" },
+]
+
+[[package]]
 name = "en-core-web-lg"
 version = "3.8.0"
 source = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl" }
 wheels = [
     { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl", hash = "sha256:293e9547a655b25499198ab15a525b05b9407a75f10255e405e8c3854329ab63" },
+]
+
+[[package]]
+name = "es-core-news-md"
+version = "3.8.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl" }
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl", hash = "sha256:478b8bb3f3e8eb149192f7d80e7cd64f990b7e9bccbc5329df41a57e86326be2" },
 ]
 
 [[package]]
@@ -372,8 +388,17 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+de = [
+    { name = "de-core-news-md" },
+]
 en = [
     { name = "en-core-web-lg" },
+]
+es = [
+    { name = "es-core-news-md" },
+]
+fr = [
+    { name = "fr-core-news-md" },
 ]
 tr = [
     { name = "safetensors" },
@@ -388,7 +413,10 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "de-core-news-md", marker = "extra == 'de'", url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl" },
     { name = "en-core-web-lg", marker = "extra == 'en'", url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl" },
+    { name = "es-core-news-md", marker = "extra == 'es'", url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl" },
+    { name = "fr-core-news-md", marker = "extra == 'fr'", url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl" },
     { name = "lingua-language-detector", specifier = "==2.2.0" },
     { name = "presidio-analyzer" },
     { name = "presidio-anonymizer" },
@@ -396,7 +424,7 @@ requires-dist = [
     { name = "torch", marker = "extra == 'tr'", specifier = "==2.14.0" },
     { name = "transformers", marker = "extra == 'tr'", specifier = "==5.17.0" },
 ]
-provides-extras = ["en", "tr"]
+provides-extras = ["en", "es", "fr", "de", "tr"]
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest" }]
@@ -408,6 +436,14 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/0f/59/e19834834cb01a32febfbb0f8a23a9088088f5d45991824ff2bc3b5e8acb/filelock-3.32.7.tar.gz", hash = "sha256:37b8a3d9811b0f9aef7e5ec5c71bb320de52df51e6ca9bcd6f5ad81187660da7", size = 225154, upload-time = "2026-09-16T00:24:20.907Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/15/df/31098c5aeb4d966b553641472bd55fcf5fdfac953549894b8a765ba44e91/filelock-3.32.7-py3-none-any.whl", hash = "sha256:65ff0d0190ea42038b32bda4b77834fb05be2cad4c5b9b01aa4dfb3614536e52", size = 100157, upload-time = "2026-09-16T00:24:19.543Z" },
+]
+
+[[package]]
+name = "fr-core-news-md"
+version = "3.8.0"
+source = { url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl" }
+wheels = [
+    { url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl", hash = "sha256:8a70d090a54ef77525c3ffa6a6195b9d365f2cf369ae1cd84ede93f3d709079e" },
 ]
 
 [[package]]

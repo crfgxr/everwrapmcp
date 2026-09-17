@@ -10,18 +10,7 @@ import tempfile
 
 from .policy import SingleNotePolicy
 
-PACKS = {
-    "en": {"name": "English", "packages": ["https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl"],
-           "sample": "Talk to Alex Smith about the community garden.", "private": ["Alex", "Smith"]},
-    "tr": {"name": "Turkish", "packages": ["transformers==5.17.0", "torch==2.14.0", "safetensors==0.8.0"],
-           "sample": "Bugün Ayşe Yılmaz ile konuştum.", "private": ["Ayşe", "Yılmaz"]},
-}
-
-
-def validate_languages(values):
-    if not values or any(x not in PACKS for x in values) or len(set(values)) != len(values):
-        raise ValueError("Select English (en), Turkish (tr), or both; other packs are not available.")
-    return tuple(sorted(values))
+from .packs import PACKS, validate_languages
 
 
 def save_languages(path, languages, original):
@@ -58,8 +47,9 @@ def main():
     values = args.languages
     if values is None:
         if not sys.stdin.isatty():
-            parser.error("Pass --languages en, tr, or en tr in noninteractive setup.")
-        print("Available packs: English (en), Turkish (tr). Both have synthetic regression coverage, not guaranteed detection.")
+            parser.error("Pass --languages with one or more of en, tr, es, fr, de in noninteractive setup.")
+        print("Available packs: " + ", ".join(f"{pack['name']} ({code})" for code, pack in PACKS.items()))
+        print("Packs have synthetic regression coverage, not guaranteed detection.")
         print("Choose all languages present in your notes, including mixed notes.")
         values = input("Languages [en tr]: ").strip().lower().replace(",", " ").split() or ["en", "tr"]
     try:
@@ -70,6 +60,9 @@ def main():
         uv = shutil.which("uv")
         if not uv:
             raise ValueError("Install uv before running language setup.")
+        for code in languages:
+            print(f"Selected {PACKS[code]['name']} model license: {PACKS[code]['license']}")
+        print("Download warning: model wheels are third-party packages, not certified by the advisory scan. Only pinned official sources are used.")
         packages = [package for code in languages for package in PACKS[code]["packages"]]
         subprocess.run([uv, "pip", "install", "--python", sys.executable, *packages], check=True)
         if "tr" in languages:

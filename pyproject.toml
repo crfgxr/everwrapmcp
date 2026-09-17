@@ -13,6 +13,9 @@ dependencies = [
 
 [project.optional-dependencies]
 en = ["en-core-web-lg"]
+es = ["es-core-news-md"]
+fr = ["fr-core-news-md"]
+de = ["de-core-news-md"]
 tr = ["transformers==5.17.0", "torch==2.14.0", "safetensors==0.8.0"]
 
 [dependency-groups]
@@ -24,3 +27,6 @@ testpaths = ["tests"]
 
 [tool.uv.sources]
 en-core-web-lg = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl" }
+es-core-news-md = { url = "https://github.com/explosion/spacy-models/releases/download/es_core_news_md-3.8.0/es_core_news_md-3.8.0-py3-none-any.whl" }
+fr-core-news-md = { url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.8.0/fr_core_news_md-3.8.0-py3-none-any.whl" }
+de-core-news-md = { url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.8.0/de_core_news_md-3.8.0-py3-none-any.whl" }

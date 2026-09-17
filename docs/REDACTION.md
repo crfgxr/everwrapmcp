@@ -25,7 +25,7 @@ redacted mode. Restart an older server after updating to load this policy option
    See [large-note selection and pagination](LARGE_NOTES.md).
    Normalize character entities, Unicode compatibility forms, and invisible format
    characters. Run shared Presidio patterns/checksum recognizers across the complete
-   window. Route sentence/paragraph units with Lingua to English spaCy or Turkish
+   window. Route sentence/paragraph units with Lingua to selected English/Spanish/French/German spaCy or Turkish
    BERT NER according to the selected local packs. Unsupported or uncertain units
    are withheld as `[LANGUAGE_UNSUPPORTED]` (overlaps may become `[REDACTED]`). Turkish inference uses overlapping 400-token
    windows with an 80-token overlap, so long tails are not silently truncated.
@@ -55,8 +55,8 @@ text or detected values. Intermediate raw data stays in the wrapper's memory.
 ## Coverage and limits
 
 This is automatic **best-effort masking**, without a human approval step. It uses
-Selected English/Turkish statistical NER with extra bilingual patterns. Lingua
-checks its full language set, but only selected English/Turkish packs can produce
+Selected statistical NER for five languages with multilingual label patterns. Lingua
+checks its full language set, but only selected supported packs can produce
 readable output. Purely numeric units still use shared rules and the date preference.
 The language-confidence cutoff is a heuristic, not a calibrated privacy guarantee.
 Mixed-language sentences and short ambiguous text can still be misclassified. Contextual names, unusual addresses, ambiguous birthdays, unfamiliar
@@ -108,7 +108,7 @@ about 50 ms on the development Mac. This excludes model startup, Evernote networ
 time and large-note processing; it is not an end-to-end latency promise. Real-note
 search should be repeated after the MCP process is restarted to load the change.
 
-## Configurable language-pack validation
+## Historical two-language pack validation
 
 The language-pack update passed 274 current regression tests (excluding the
 separate historical stock-baseline gate). A final 16-test pack suite also passed,

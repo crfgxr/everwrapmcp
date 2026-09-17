@@ -8,6 +8,7 @@ Start with the [project overview](../README.md).
 - [Onboarding, dummy examples and block-list setup](ONBOARDING.md)
 - [ChatGPT, Claude and Codex compatibility](CLIENT_COMPATIBILITY.md)
 - [Instructions for a setup agent](AGENT_SETUP.md)
+- [Language packs, coverage and model licenses](LANGUAGE_PACKS.md)
 - [Privacy and masking limits](REDACTION.md)
 
 ## Retrieval reference

@@ -10,7 +10,7 @@ from everwrap.policy import SingleNotePolicy, InvalidPolicy
 from everwrap.setup import save_languages, main
 from everwrap.redaction import get_redactor
 
-@pytest.mark.parametrize('value', [[], ['fr'], ['en','en'], 'en', None, [42]])
+@pytest.mark.parametrize('value', [[], ['it'], ['en','en'], 'en', None, [42]])
 def test_invalid_language_policy(tmp_path, value):
     path = tmp_path/'policy.json'
     path.write_text(json.dumps({'access_mode':'denylist', 'languages':value}))

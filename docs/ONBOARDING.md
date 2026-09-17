@@ -91,10 +91,8 @@ recognizers overlap; placeholder labels are not always `[EMAIL_ADDRESS]`.
 The original note stays unchanged. “Without masking” above is a comparison, not
 an onboarding step that disables protection. No real secret is needed for testing.
 
-The examples here are in English. **Masking currently supports English and
-Turkish**, with local language detection; mixed-language notes are included in
-our tests. Additional languages require validated models and rules and are not
-yet supported. [Language coverage](#which-languages-are-covered).
+The examples here are in English. **Masking supports English, Turkish, Spanish, French, and German**, with local language detection; mixed-language notes are included in
+our tests. Languages outside these five require validated models and rules. [Language coverage](#which-languages-are-covered).
 
 ## Example prompts and answers
 
@@ -140,7 +138,7 @@ During setup, your agent should ask: **“Which languages do your notes contain?
 Do you mix languages within a note?”** This is about the notes, not the language
 you use to chat with your assistant.
 
-Choose **English, Turkish, or both** during [installation](INSTALL.md#choose-language-packs).
+Choose any combination of **English, Turkish, Spanish, French, and German** during [installation](INSTALL.md#choose-language-packs).
 Only the selected models are installed and loaded; existing downloaded models are
 not removed. The installer verifies fictional names are masked before saving the
 selection. Routing is automatic during use, including mixed notes.
@@ -148,15 +146,16 @@ selection. Routing is automatic during use, including mixed notes.
 Unconfigured or uncertain passages are withheld rather than returned as protected
 text. Short phrases may be withheld unnecessarily, and language identification can
 still be wrong. These tests do not guarantee perfect privacy. Keep initial testing
-to a synthetic note. Other languages require additional validated packs.
+to a synthetic note. Languages outside these five require additional validated packs.
+[Pack details and licenses](LANGUAGE_PACKS.md).
 
 
 ## Adding another language
 
 The architecture can be extended. Lingua can identify many languages, but
 identification alone does not recognize sensitive names, addresses or identifiers.
-EverWrapMCP currently configures its language routing and masking for English and
-Turkish. Installing Lingua does not automatically enable all its languages here.
+EverWrapMCP currently configures its language routing and masking for English, Turkish, Spanish, French,
+and German. Installing Lingua does not automatically enable all its languages here.
 
 A developer or coding agent can add a language by implementing its routing,
 integrating a suitable local NER model and localized rules, and validating both

@@ -56,28 +56,33 @@ After configuring a valid private policy, run the interactive installer:
 PYTHONPATH=src .venv/bin/python -m everwrap.setup
 ```
 
-Choose English (`en`), Turkish (`tr`), or both. Include all languages used in mixed
+Choose any combination of English (`en`), Turkish (`tr`), Spanish (`es`),
+French (`fr`), and German (`de`). Include all languages used in mixed
 notes. For agent-driven setup, use the user's answer explicitly:
 
 ```sh
 PYTHONPATH=src .venv/bin/python -m everwrap.setup --languages en tr
 ```
 
-Use `--languages en` or `--languages tr` for a single pack. Setup installs only the
+For example, use `--languages es` for Spanish alone, or `--languages en fr de`
+for English, French and German. Setup installs only the
 selected model dependencies, runs fictional masking checks, then saves `languages`
 in the ignored local policy. It preserves block lists, access mode and date settings.
 It reads no Evernote notes. Existing model files are not uninstalled.
 
 Routing runs locally and withholds passages identified as unsupported or uncertain.
 Short or mixed-language text can be misclassified; selection is not a guarantee
-that every sensitive detail is found. English and Turkish have regression coverage;
-other packs are not available yet. The block list is enforced before note access.
+that every sensitive detail is found. These five packs have synthetic regression coverage;
+additional languages require new models/rules and tests. Local formats vary, and
+not every address or national identifier is covered. See [pack details and licenses](LANGUAGE_PACKS.md).
+**Download warning:** model wheels are third-party packages; the advisory scan
+does not assess their direct-URL releases. Use only the pinned official sources. The block list is enforced before note access.
 
 Existing policies without `languages` retain English-and-Turkish behavior. Rerun
 setup to change packs, then restart the MCP connection. Missing selected models
 block access. Running plain `uv sync` later removes optional model dependencies;
 rerun setup and reinstall `requirements-live.txt` afterward. Developers running the
-full regression suite can install both extras with `uv sync --extra en --extra tr`,
+full regression suite can install all extras with `uv sync --all-extras`,
 install live dependencies, and download Turkish weights with `python -m everwrap.language`.
 
 ## Authenticate

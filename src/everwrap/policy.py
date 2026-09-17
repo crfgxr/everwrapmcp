@@ -5,6 +5,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .packs import SUPPORTED_LANGUAGES
+
 
 class AccessDenied(Exception):
     """Safe to expose: no request IDs, account details, or note text."""
@@ -37,7 +39,7 @@ class SingleNotePolicy:
     def __post_init__(self):
         try:
             if (type(self.languages) is not tuple or not self.languages
-                    or any(type(x) is not str or x not in {"en", "tr"} for x in self.languages)
+                    or any(type(x) is not str or x not in SUPPORTED_LANGUAGES for x in self.languages)
                     or len(set(self.languages)) != len(self.languages)):
                 raise AccessDenied()
             if type(self.mask_dates) is not bool:

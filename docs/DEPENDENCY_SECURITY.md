@@ -40,3 +40,19 @@ pip-audit -r /tmp/everwrap-installed.txt --no-deps --disable-pip
 `--no-deps` here audits an already complete installed dependency list, rather than
 asking pip-audit to install or resolve the application again. Model weights and
 private policies are not included in reports or sent to the advisory service.
+
+## Five-language pack update
+
+A rescan with pip-audit 2.10.1 found no known vulnerabilities in **90 assessed
+packages**. Four direct-URL wheels were skipped: English en_core_web_lg and Spanish,
+French and German core_news_md. Those wheels and their weights were **not assessed**;
+this is not evidence that they are vulnerability-free. All are pinned official
+spaCy 3.8.0 releases. The new models add no package dependencies to the installed
+environment. See [the new report](dependency-audit-five-languages.json) and
+[model licenses](LANGUAGE_PACKS.md#models-and-licenses).
+
+The advisory result applies to the installed environment **after**
+`requirements-live.txt`, which pins patched cryptography. The universal core lock
+still resolves the older version; plain `uv sync` can restore it. Always reinstall
+the live requirements after syncing, as the installation guide requires. Aligning
+the universal lock with the patched platform packages remains a packaging gap.

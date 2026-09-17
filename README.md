@@ -6,7 +6,7 @@ Some notes should never reach your AI assistant. Others are useful, but contain
 names, contact details or secrets. EverWrapMCP adds a private block list and local
 masking between Evernote and your assistant. Your original notes stay unchanged.
 
-**Public experiment · macOS · read-only · English + Turkish · MIT**
+**Public experiment · macOS · read-only · 5 note languages · MIT code**
 
 ```text
 Evernote → EverWrapMCP on your Mac → your AI assistant
@@ -66,10 +66,10 @@ A repository link alone does not connect an ordinary web chat to your notes.
 
 ## What setup asks you
 
-1. **Your app and note languages.** Choose English, Turkish, or both. Setup installs and tests the selected masking packs; routing is automatic during use.
+1. **Your app and note languages.** Choose any combination of **English, Turkish, Spanish, French, and German**. Setup installs and tests the selected masking packs; routing is automatic during use.
    Other languages need additional models, rules and validation. Unsupported or
    uncertain passages are withheld; language detection is not a privacy guarantee.
-   [How language support can be extended](docs/ONBOARDING.md#adding-another-language).
+   [Language packs and coverage](docs/ONBOARDING.md#adding-another-language).
 2. **A fictional test note.** Start with access to just that note.
 3. **Which notes to block.** Provide internal note links or IDs, not their contents.
 4. **Read-only sign-in.** Complete Evernote authorization in your browser.
@@ -99,6 +99,8 @@ The user completes browser sign-in; the agent reports actual test results.
 Masking is **best-effort**: it can miss sensitive details or mask harmless words.
 Processed text reaches your AI provider. A separate direct Evernote connection
 bypasses the wrapper. Keep note IDs, credentials and your block list private.
+Model wheels are third-party downloads and were not assessed by the advisory scan;
+use the pinned official sources. [Model warnings and licenses](docs/LANGUAGE_PACKS.md).
 
 This is an experiment, not a security sandbox or a one-click product. A fresh-Mac
 onboarding test and live verification of other clients remain outstanding.

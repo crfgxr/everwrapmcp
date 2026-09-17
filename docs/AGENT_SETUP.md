@@ -23,15 +23,15 @@ report them as successful checks without actual tool evidence.
 ## Ask about note languages
 
 Ask: “Which languages do your notes contain? Do you mix languages within a note?”
-Offer English, Turkish, both, or another language as conversational answers.
+Offer English, Turkish, Spanish, French, German, or any combination. Ask about
+other languages too so gaps are visible.
 Use an answer already supplied by the user; do not ask repeatedly. After creating
-or validating the private policy, run `everwrap.setup --languages en`, `--languages tr`,
-or `--languages en tr` using the checkout's Python and PYTHONPATH as shown in INSTALL.md.
+or validating the private policy, run `everwrap.setup --languages` followed by the selected codes (`en tr es fr de`) using the checkout's Python and PYTHONPATH as shown in INSTALL.md.
 The installer downloads selected packs, runs fictional checks and writes the local
 `languages` setting only after success. Preserve all exclusions and access settings.
-This setting is not a per-request tool argument. Existing policies default to both.
+This setting is not a per-request tool argument. Existing policies default to English and Turkish.
 
-Other languages need model/rule integration and tests; Lingua identification alone
+Languages outside these five need model/rule integration and tests; Lingua identification alone
 is not masking coverage. Explain this gap if the requested pack is unavailable.
 Unsupported or uncertain passages are withheld, but language detection is fallible.
 Never resolve a coverage failure by disabling masking or removing exclusions.

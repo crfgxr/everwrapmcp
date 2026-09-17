@@ -45,7 +45,7 @@ complete privacy coverage or consistently good retrieval.
 
 - Language detection checks the broader Lingua set and withholds unsupported or
   uncertain units. Benchmark misclassification and false withholding, especially
-  for short text; masking packs still cover only English/Turkish.
+  for short text; masking packs cover English, Turkish, Spanish, French and German.
 - Mixed languages within one sentence, very short titles, names shared between
   languages, Turkish suffixes, missing diacritics, lowercase names and misspellings.
 - Names split across markup, paragraphs or token windows; unusual addresses,
@@ -146,8 +146,7 @@ an account-wide index as an implicit performance optimization.
 
 ## Additional languages: proposed, not enabled
 
-Lingua supports many languages, but this runtime is configured for English and
-Turkish only. Expanding identification alone does not provide PII protection.
+Lingua supports many languages, but this runtime provides packs for English, Turkish, Spanish, French and German. Expanding identification alone does not provide PII protection.
 Each supported language needs an evaluated NER model or a validated multilingual
 model, localized recognizers/context, mixed-language and unsupported-language
 behavior, and held-out privacy/readability tests. Check licenses, dependencies,
@@ -158,8 +157,22 @@ Do not load ten large models for every user or claim a universal "top ten" witho
 defining the audience. Compare shared multilingual NER against separate models
 on each language; an aggregate score can hide poor coverage in one language.
 Unsupported or uncertain text must not silently be treated as reliably masked.
-English/Turkish pack selection and broader language detection are implemented.
+Five-language pack selection and broader language detection are implemented.
 Unsupported or uncertain units are withheld. Expand independent evaluation of this
 behavior before adding packs; confident misclassification remains possible.
 
 Source: [Lingua language list](https://github.com/pemistahl/lingua-py#4-which-languages-are-supported).
+
+## Future optional editing — not implemented
+
+Current connections and exposed tools are read-only. A possible future editing
+feature must be explicitly opted into, with separate write authorization rather
+than silently upgrading an existing read-only connection. Before authorization,
+warn that write access can modify notes and may overwrite or remove information.
+Users should be able to continue using only read/search tools.
+
+Before implementing writes, verify the official upstream tool and OAuth scopes.
+Require a concrete change preview and user approval, enforce exclusions before
+both reads and writes, detect concurrent edits, and provide a recovery strategy.
+Never write masked placeholders back into the source note by accident. Do not
+represent upstream edit capability as already supported by EverWrapMCP.

@@ -1,8 +1,9 @@
-"""Local language routing and Turkish NER; no downloads during note access."""
+"""Local language routing and selected NER models; no downloads during note access."""
 import re
 from pathlib import Path
 
 from .service import ProcessingBlocked
+from .packs import PACKS, validate_languages
 
 MODEL_ID = "akdeniz27/bert-base-turkish-cased-ner"
 MODEL_REVISION = "99995f7d2be4b3a28c74f0d36ee97f8c04ee0571"
@@ -22,9 +23,14 @@ class LanguageAwareAnalyzer:
     def __init__(self, analyzer, english_nlp, languages=("en", "tr")):
         from lingua import LanguageDetectorBuilder
         import spacy
-        self.enabled = tuple(languages)
+        self.enabled = validate_languages(languages)
         self.detector = LanguageDetectorBuilder.from_all_languages().build()
         self.english = english_nlp
+        self.models = {"en": english_nlp} if "en" in self.enabled else {}
+        import importlib
+        for code in self.enabled:
+            if code not in {"en", "tr"}:
+                self.models[code] = importlib.import_module(PACKS[code]["model"]).load()
         self.tokens = spacy.blank("en")
         self.rules = analyzer
         # Regex/checksum detectors run for the entire text, regardless of routing.
@@ -50,7 +56,8 @@ class LanguageAwareAnalyzer:
         if not scores:
             return ()
         best = scores[0]
-        code = {Language.ENGLISH: "en", Language.TURKISH: "tr"}.get(best.language)
+        code = {Language.ENGLISH: "en", Language.TURKISH: "tr",
+                Language.SPANISH: "es", Language.FRENCH: "fr", Language.GERMAN: "de"}.get(best.language)
         if code not in enabled or best.value < .15:
             return ()
         return (code,)
@@ -86,6 +93,8 @@ class LanguageAwareAnalyzer:
             # Sentence/paragraph units handle language switches within a note.
             # Keep exact source offsets; no normalization or reconstruction here.
             segmentation = re.sub(r"[^\s@]+@[^\s@]+", lambda m: m.group().rstrip(".!?").replace(".", "_") + m.group()[len(m.group().rstrip(".!?")):], text)
+            # German written dates use a dot after the day, not a sentence boundary.
+            segmentation = re.sub(r"(?<=\d)\.(?=[ \t]+(?:Januar|Februar|März|April|Mai|Juni|Juli|August|September|Oktober|November|Dezember)\b)", "_", segmentation, flags=re.IGNORECASE)
             for unit in re.finditer(r"[^\n.!?]+(?:[.!?]+|$)|[^\n]+$", segmentation, re.MULTILINE):
                 part = text[unit.start():unit.end()]
                 if (not any(c.isalpha() for c in part)
@@ -95,11 +104,11 @@ class LanguageAwareAnalyzer:
                 if not langs:
                     matches.append(RecognizerResult("LANGUAGE_UNSUPPORTED", unit.start(), unit.end(), 1.0))
                     continue
-                if "en" in langs:
-                    mapping = {"PERSON": "PERSON", "ORG": "ORGANIZATION",
+                for code in (code for code in langs if code in self.models):
+                    mapping = {"PERSON": "PERSON", "PER": "PERSON", "MISC": "NRP", "ORG": "ORGANIZATION",
                                "GPE": "LOCATION", "LOC": "LOCATION", "FAC": "LOCATION",
                                "DATE": "DATE_TIME", "TIME": "DATE_TIME", "NORP": "NRP"}
-                    for entity in self.english(part).ents:
+                    for entity in self.models[code](part).ents:
                         if entity.label_ in mapping:
                             matches.append(RecognizerResult(mapping[entity.label_],
                                 unit.start() + entity.start_char, unit.start() + entity.end_char, .85))
