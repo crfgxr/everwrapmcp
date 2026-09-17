@@ -1,24 +1,25 @@
 # EverWrap
 
-**Ask AI about your Evernote notes. Choose what it can read.**
+**Take control of your notes: block private notes and mask sensitive data.**
 
-A small local wrapper that blocks selected notes and masks detected sensitive text
-before returning results to your AI assistant.
+EverWrap gives you two controls over what your AI assistant receives from Evernote:
+a private note block list and local masking of detected sensitive data.
 
 **Private preview · macOS · read-only · experimental**
 
 ## The problem
 
-Your Evernote account holds useful ideas alongside personal details. You want AI
-to help with the ideas, without manually cleaning every note or sharing everything.
+Some notes should stay out of your AI conversations entirely. Others are useful
+to share, but contain names, contact details, or secrets you want masked.
 
 ## The solution
 
-EverWrap sits between your AI client and Evernote:
+EverWrap sits between your AI client and Evernote, applying two checks:
 
-- **Choose the notes.** Start with one test note, or allow your notes except a private block list.
-- **Mask detected details.** Local Presidio processing covers titles, note bodies, and search snippets.
-- **Keep originals intact.** The wrapper searches and reads; it cannot edit your notes.
+- **Block whole notes.** Your private block list excludes selected notes from returned reads and search results.
+- **Mask sensitive parts.** For allowed notes, local Presidio processing replaces detected sensitive text in titles, bodies, and search snippets.
+
+You get the remaining text to work with. Your original Evernote notes stay unchanged.
 
 ```text
 Evernote → EverWrap on your Mac → your AI assistant
