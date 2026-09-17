@@ -47,6 +47,14 @@ search, read, and create notes through an OAuth connection. It is currently in b
 EverWrap connects to that official server with read-only access and adds your
 local block list and masking step before results reach the assistant.
 
+## Do I need Codex?
+
+**No.** EverWrap is an MCP wrapper, not a Codex-only feature. Claude Desktop can
+use local MCP servers; ChatGPT cloud chat needs a separate tunnel or remote
+connection. Only Codex has been tested live with EverWrap so far. Giving a regular
+chat the GitHub URL does not install or connect it.
+[ChatGPT vs Claude vs Codex: setup paths and evidence](docs/CLIENT_COMPATIBILITY.md).
+
 ## Let your coding agent set it up
 
 Give an agent with local terminal access this prompt:

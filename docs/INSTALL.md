@@ -4,6 +4,9 @@ EverWrap currently runs on **macOS** and uses macOS Keychain for Evernote creden
 Windows/Linux and a one-click extension package are not supported by this build.
 The repository is private; collaborators need GitHub access before cloning.
 
+Not sure which client path you need? Read [the compatibility guide](CLIENT_COMPATIBILITY.md).
+Codex is optional; ordinary ChatGPT cloud chat does not inherit local MCP registration.
+
 ## Install the runtime
 
 Install Git and [uv](https://docs.astral.sh/uv/getting-started/installation/), then:
