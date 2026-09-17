@@ -39,6 +39,22 @@ notes should be routed automatically, and unsupported-language behavior must be
 explicitly tested before a pack is released. Selection should govern validated
 models and recognizers together, not merely the language identifier.
 
+## Ask about blocked notes before broader access
+
+Ask which notes must be excluded, using [the README link/ID instructions](../README.md#choose-the-notes-to-block).
+Offer internal links, exact UUIDs, or direct editing of the private local policy.
+Never request the contents of an excluded note. If only a title is given, ask the
+user to locate it in Evernote and copy its internal link; do not use account-wide
+search or read candidates to identify the intended private note. Titles are not
+supported block rules and may be duplicated.
+
+Extract the first note UUID only from the documented internal-link format;
+otherwise request an unambiguous ID. Validate and deduplicate locally, merge with
+existing exclusions, and preserve the current access mode. Confirm configuration
+without echoing private links unnecessarily. Do not broaden access with unresolved
+exclusions, silently discard entries beyond the 16-ID limit, or infer an empty
+block list from no response. A user can explicitly choose no exclusions.
+
 ## Install and configure
 
 1. Follow the runtime commands in INSTALL.md, including requirements-live.txt and

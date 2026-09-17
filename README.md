@@ -77,12 +77,48 @@ below is invented; none comes from a user's notes.
 | Choose a client | “Which app will you use, and are you on macOS?” | “Claude Desktop on my Mac.” The agent explains that this path is documented but not live verified here. |
 | Check languages | “Which languages are your notes in? Do you mix them?” | “English and Turkish, sometimes together.” Both models are installed in this release. |
 | Start small | “Create a note called Garden demo using the fictional text below, then give me its internal note link.” | The agent configures access to that test note only, with masking enabled. |
+| Choose exclusions | “Which notes should always be blocked? Supply their internal links or note IDs; no note contents are needed.” | “Block my fictional Private demo note.” A title alone needs its exact ID before the agent can confirm the block. |
 | Connect | “Complete Evernote's read-only sign-in in your browser.” | You approve the connection yourself; you never paste a password or token into chat. |
 | Test | “Let's check a permitted read and a synthetic blocked ID.” | The agent reports what actually passed, or the specific step still incomplete. |
 | Choose wider access later | “Would you like to keep test-note-only access, or configure access to other notes with your private exclusions?” | “Keep test-note-only for now.” Nothing is broadened automatically. |
 
 The agent should reuse answers you already supplied. If your client or language
 is unsupported, it should explain that before claiming setup is complete.
+
+## Choose the notes to block
+
+Before enabling access beyond the test note, your setup agent should ask:
+
+> “Which notes must stay out of AI results? Give their internal Evernote links or
+> note IDs, or add them directly to the private local policy if you prefer not to
+> put identifiers in chat. You don't need to share their contents.”
+
+On Evernote for Mac, select the note and use **Control + Option + Command + C**
+to copy its internal link. Paste it into the private setup conversation or local
+policy workflow—not a public issue. Do not make the note public.
+[Evernote's note-link instructions](https://help.evernote.com/hc/en-us/articles/208313588-Note-links).
+
+An internal link has this shape (placeholders only):
+
+```text
+evernote:///view/ACCOUNT/SHARD/NOTE_GUID/OTHER_GUID
+```
+
+The note ID is **NOTE_GUID**, the first UUID after the shard. The setup agent
+extracts and validates it, then saves that ID in `blocked_note_ids` in the ignored
+`.everwrap-local.json`. The MCP read tool accepts the UUID, not the full link.
+If a link has another shape, do not guess the ID or open the note to inspect its
+contents; ask for the internal link or the exact note UUID.
+
+**A title is not a block rule.** If you only know the name, find that note in
+Evernote yourself and copy its internal link. Duplicate titles are possible.
+The agent should not search your private note contents to resolve a note you
+want excluded, and must not claim the block is saved until its ID is configured.
+
+The current block list supports **up to 16 note IDs**. A block wins over an allow.
+If your exclusions are unresolved or exceed that limit, keep test-note-only
+access; do not silently omit entries or enable broader access. Choosing no
+exclusions should be an explicit user choice. [Policy setup](docs/INSTALL.md#allow-more-notes).
 
 ## A fictional note, before and after masking
 
