@@ -17,8 +17,8 @@ report them as successful checks without actual tool evidence.
   paths for client registration. Do not put a checkout in a disposable temp folder.
 - Inspect existing configuration before changing it. Merge the EverWrapMCP entry;
   preserve unrelated servers and never overwrite an existing private policy.
-- The repository is public and its original code is MIT-licensed. It is still
-  experimental; do not claim a packaged one-click release exists.
+- The repository is public and its original code is MIT-licensed. It is a
+  preview release; do not claim a packaged one-click release exists.
 
 ## Ask about note languages
 

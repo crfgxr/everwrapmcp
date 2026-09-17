@@ -6,7 +6,7 @@ Some notes should never reach your AI assistant. Others are useful, but contain
 names, contact details or secrets. EverWrapMCP adds a private block list and local
 masking between Evernote and your assistant. Your original notes stay unchanged.
 
-**Public experiment · macOS · read-only · 5 note languages · MIT code**
+**Preview release · macOS · read-only · Languages (English, Turkish, Spanish, French, German) · MIT code**
 
 ```text
 Evernote → EverWrapMCP on your Mac → your AI assistant
@@ -102,7 +102,7 @@ bypasses the wrapper. Keep note IDs, credentials and your block list private.
 Model wheels are third-party downloads and were not assessed by the advisory scan;
 use the pinned official sources. [Model warnings and licenses](docs/LANGUAGE_PACKS.md).
 
-This is an experiment, not a security sandbox or a one-click product. A fresh-Mac
+This preview release is not a security sandbox or a one-click product. A fresh-Mac
 onboarding test and live verification of other clients remain outstanding.
 [Privacy details](docs/REDACTION.md) · [Known gaps](docs/IMPROVEMENTS.md)
 
