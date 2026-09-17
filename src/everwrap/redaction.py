@@ -146,6 +146,8 @@ class PresidioRedactor:
         if not text:
             return text
         matches = self.analyzer.analyze(text=text, language="en", score_threshold=0.35)
+        if not getattr(self, 'mask_dates', True):
+            matches = [match for match in matches if match.entity_type != 'DATE_TIME']
         # Union overlapping spans so a shorter, higher-confidence result cannot
         # leave part of a longer sensitive value visible.
         merged = []
@@ -179,6 +181,11 @@ class PresidioRedactor:
         return self.sanitize_text(markup_to_text(text))
 
 
-@lru_cache(maxsize=1)
-def get_redactor():
+@lru_cache(maxsize=2)
+def get_redactor(mask_dates=True):
+    if not mask_dates:
+        from copy import copy
+        redactor = copy(get_redactor())
+        redactor.mask_dates = False
+        return redactor
     return PresidioRedactor()

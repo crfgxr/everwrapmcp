@@ -25,7 +25,7 @@ def build_server(service) -> Server:
             description=("Read a note only when local access policy permits it. Explicitly blocked IDs "
                          "are denied before fetch. Local redacted mode masks detected sensitive spans "
                          "with Presidio and returns a bounded plain-text page (default 4000 characters). "
-                         "Use view=latest for the newest recognized standalone date heading; dates remain masked. "
+                         "Use view=latest for the newest recognized standalone date heading; date visibility follows local policy. "
                          "Use view=query with keywords for local section selection, or start/end. "
                          "Follow next.section and next.offset using view=start for more text. "
                          "Latest means recognized headings only; never infer a missing date. "

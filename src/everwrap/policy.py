@@ -31,9 +31,12 @@ class SingleNotePolicy:
     blocked_note_ids: frozenset[str] = field(default_factory=frozenset, repr=False)
     access_mode: str = "single_note"
     content_mode: str = "blocked"
+    mask_dates: bool = True
 
     def __post_init__(self):
         try:
+            if type(self.mask_dates) is not bool:
+                raise AccessDenied()
             if self.access_mode not in ("single_note", "denylist") or self.content_mode not in ("blocked", "unredacted", "redacted"):
                 raise AccessDenied()
             normalized = (None if self.allowed_note_id is None and self.access_mode == "denylist"
@@ -65,13 +68,14 @@ class SingleNotePolicy:
 
             data = json.loads(raw, object_pairs_hook=unique_fields)
             if (not isinstance(data, dict)
-                    or not set(data) <= {"allowed_note_id", "blocked_note_ids", "access_mode", "content_mode"}):
+                    or not set(data) <= {"allowed_note_id", "blocked_note_ids", "access_mode", "content_mode", "mask_dates"}):
                 raise ValueError
             blocked = data.get("blocked_note_ids", [])
             if type(blocked) is not list or len(blocked) > 16:
                 raise ValueError
             return cls(data.get("allowed_note_id"), frozenset(blocked),
-                       data.get("access_mode", "single_note"), data.get("content_mode", "blocked"))
+                       data.get("access_mode", "single_note"), data.get("content_mode", "blocked"),
+                       data.get("mask_dates", True))
         except (OSError, ValueError, TypeError, InvalidPolicy):
             raise InvalidPolicy("Single-note policy is unavailable or invalid.") from None
 

@@ -5,6 +5,13 @@ sensitive text from permitted notes. The block list remains authoritative:
 redaction never makes a blocked note readable. No tool argument can disable
 masking, modify access, or request a raw fallback.
 
+Date/time masking defaults to on. Set `"mask_dates": false` in the private local
+policy to preserve spans detected as `DATE_TIME`, including date headings, times,
+and birthday dates. Other detected entity types and the block list remain enforced;
+overlapping secret or other sensitive matches still win. This setting cannot be
+changed through tool arguments. Search timestamp metadata is still omitted in
+redacted mode. Restart an older server after updating to load this policy option.
+
 ## Data flow
 
 1. Load and validate local policy. Deny blocked direct IDs before network access.

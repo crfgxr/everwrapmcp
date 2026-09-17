@@ -83,7 +83,7 @@ Your private block list and OAuth credentials stay out of the repository.
 
 ## Where it stands
 
-- **211 focused tests passed**, including large-note paging and masking boundaries.
+- **217 focused tests passed**, including large-note paging, date preferences, and masking boundaries.
 - Large notes are selected locally and returned as small masked pages. Ask for a
   recognized latest dated entry or a keyword-matching section without sending the
   whole journal to the model. [Large-note behavior and limits.](docs/LARGE_NOTES.md)

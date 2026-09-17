@@ -44,7 +44,8 @@ Ambiguous day/month slash dates, yearless headings, and dates embedded in prose
 are not selected. `latest_recognized_date_heading` deliberately means the latest
 **recognized heading**, not a guarantee about every date format in the note.
 No heading or no keyword match returns an explicit empty-result status. Dates
-remain masked in content; raw dates are not returned as metadata.
+are masked by default; the local `mask_dates: false` preference preserves detected
+dates and times in text. Raw dates are not returned as separate metadata.
 
 ## Resource and privacy boundaries
 
