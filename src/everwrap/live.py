@@ -48,13 +48,22 @@ class NoteService:
         output = await asyncio.to_thread(method, value)
         return bounded_text(output, limit)
 
-    async def read_safe_note(self, note_id):
+    async def read_safe_note(self, note_id, **selection):
         authorized = self.policy.authorize(note_id)
         self.require_opt_in()
+        from .sections import read_section, validate_selection
+        validate_selection(**({'view': 'start', 'section': 0, 'offset': 0,
+                               'max_chars': 4000, 'query': None} | selection))
+        if selection and self.policy.content_mode != 'redacted':
+            raise AccessDenied('Section reads require redacted mode.')
         data = structured(await self.backend.get_note(authorized))
         returned_id = self.policy.authorize(data.get("id"))
         if returned_id != authorized:
             raise ProcessingBlocked("Unexpected upstream identity.")
+        if self.policy.content_mode == 'redacted':
+            page = await asyncio.to_thread(read_section, data.get('content'), self.redactor, **selection)
+            return {'id': authorized, 'title': await self.text_field(data.get('title'), 1000),
+                    **page, 'content_format': 'plain_text', 'content_mode': 'redacted'}
         return {
             "id": authorized,
             "title": await self.text_field(data.get("title"), 1000),
@@ -141,8 +150,8 @@ class ConfiguredService:
             raise ProcessingBlocked("Local policy changed during processing.")
         return result
 
-    async def read_safe_note(self, note_id):
-        return await self._run("read_safe_note", note_id=note_id)
+    async def read_safe_note(self, note_id, **selection):
+        return await self._run("read_safe_note", note_id=note_id, **selection)
 
     async def search_safe_notes(self, query, sort="updated_desc", limit=5):
         return await self._run("search_safe_notes", query=query, sort=sort, limit=limit)

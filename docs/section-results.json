@@ -1,0 +1,11 @@
+{
+  "synthetic": true,
+  "source_characters": 459103,
+  "sections": 48,
+  "model_load_seconds": 1.447,
+  "full_local_masking_seconds": 30.386,
+  "selected_local_masking_seconds": 0.278,
+  "full_output_characters": 374008,
+  "selected_output_characters": 55,
+  "notes": "Single warm-model comparison on this machine; excludes network. Character counts are not token counts."
+}

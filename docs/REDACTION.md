@@ -13,11 +13,15 @@ masking, modify access, or request a raw fallback.
 3. Fetch the permitted note, or discard blocked upstream search rows locally.
 4. Flatten ENML/HTML bodies and snippets with an inert parser. Drop attributes,
    comments, scripts/styles, encrypted payloads, and attachment references.
-5. Normalize character entities, Unicode compatibility forms, and invisible format
+5. For note reads, select a bounded section locally (optionally by a recognized
+   date heading or keywords), retaining neighboring sections for detection context.
+   See [large-note selection and pagination](LARGE_NOTES.md).
+   Normalize character entities, Unicode compatibility forms, and invisible format
    characters. Run Presidio Analyzer with the installed English NLP model and
    supplemental English/Turkish patterns plus credential recognizers.
 6. Merge overlapping detected spans and use Presidio Anonymizer to replace them
-   with typed placeholders. Return only processed title/body/snippet fields.
+   with typed placeholders. Page only after masking; return only processed text
+   and explicit section/continuation metadata.
 7. Omit search timestamps in redacted mode. Retain routing UUIDs for follow-up
    reads. Recheck that policy did not change before returning output.
 

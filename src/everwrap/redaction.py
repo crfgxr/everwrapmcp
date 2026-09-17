@@ -130,6 +130,15 @@ class PresidioRedactor:
         self.anonymizer = AnonymizerEngine()
 
     def sanitize_text(self, text):
+        return self._sanitize(text)
+
+    def sanitize_window(self, text, start, end):
+        # Selection offsets refer to already normalized local text.
+        if normalize_text(text) != text or not 0 <= start <= end <= len(text):
+            raise ProcessingBlocked("Invalid redaction window.")
+        return self._sanitize(text, (start, end))
+
+    def _sanitize(self, text, selection=None):
         from presidio_analyzer import RecognizerResult
         from presidio_anonymizer.entities import OperatorConfig
 
@@ -152,6 +161,12 @@ class PresidioRedactor:
                     prior.entity_type = "REDACTED"
             else:
                 merged.append(RecognizerResult(match.entity_type, match.start, match.end, 1.0))
+        if selection is not None:
+            start, end = selection
+            merged = [RecognizerResult(m.entity_type, max(m.start, start) - start,
+                                       min(m.end, end) - start, 1.0)
+                      for m in merged if m.start < end and m.end > start]
+            text = text[start:end]
         operators = {m.entity_type: OperatorConfig("replace", {"new_value": f"[{m.entity_type}]"})
                      for m in merged}
         output = self.anonymizer.anonymize(text=text, analyzer_results=merged,

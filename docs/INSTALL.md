@@ -194,6 +194,11 @@ interface. This does not prevent bypass by an agent that can modify local code o
 access credentials. Masking is best-effort; processed text is sent to your AI
 provider. Read [redaction limits](REDACTION.md) before using personal notes.
 
+Long notes use [local section selection and masked pages](LARGE_NOTES.md).
+The default read returns up to 4,000 body characters; ask for the latest recognized
+dated entry or a keyword-matching section to avoid retrieving the whole journal.
+Restart the MCP connection after updating so the client sees the new read options.
+
 ## Run the checks
 
 ```sh
