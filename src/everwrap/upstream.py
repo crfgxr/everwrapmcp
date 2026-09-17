@@ -39,6 +39,15 @@ class OfficialBackend:
         self.policy = policy
         self.client_factory = client_factory
 
+    async def semantic_search(self, query, max_results):
+        if self.policy.access_mode != 'denylist' or self.policy.content_mode != 'redacted':
+            raise ProcessingBlocked('Safe semantic search is not enabled.')
+        async with self.client_factory() as client:
+            return await client.call_tool('semantic_search', {
+                'query': query, 'maxResults': max_results,
+                'clientTimeZone': 'UTC', 'keywordSearchFallback': False,
+            })
+
     async def get_note(self, note_id):
         authorized = self.policy.authorize(note_id)  # Before transport/auth/network.
         if self.policy.content_mode not in ("unredacted", "redacted"):

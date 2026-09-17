@@ -198,6 +198,8 @@ Long notes use [local section selection and masked pages](LARGE_NOTES.md).
 The default read returns up to 4,000 body characters; ask for the latest recognized
 dated entry or a keyword-matching section to avoid retrieving the whole journal.
 Restart the MCP connection after updating so the client sees the new read options.
+The updated server also exposes `semantic_search_safe_notes` for meaning-based
+retrieval in redacted denylist mode. [Semantic search guide](SEMANTIC_SEARCH.md).
 
 ## Run the checks
 

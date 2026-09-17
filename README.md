@@ -77,13 +77,19 @@ tested end-to-end here. [Full installation guide →](docs/INSTALL.md)
 
 > Use EverWrap to find my latest braindumping note and summarize it.
 
+> Use EverWrap semantic search to find past notes about feeling stuck in a role
+> that does not fit my strengths. Distinguish my own writing from saved articles.
+
+Meaning-based search returns small masked passages before fetching full notes.
+[Semantic search behavior and privacy limits.](docs/SEMANTIC_SEARCH.md)
+
 Start with the synthetic test note before expanding access. Connect **EverWrap**
 and remove any direct Evernote connector if you want requests to use the wrapper.
 Your private block list and OAuth credentials stay out of the repository.
 
 ## Where it stands
 
-- **217 focused tests passed**, including large-note paging, date preferences, and masking boundaries.
+- **246 focused tests passed**, including semantic filtering, large-note paging, date preferences, and masking boundaries.
 - Large notes are selected locally and returned as small masked pages. Ask for a
   recognized latest dated entry or a keyword-matching section without sending the
   whole journal to the model. [Large-note behavior and limits.](docs/LARGE_NOTES.md)
