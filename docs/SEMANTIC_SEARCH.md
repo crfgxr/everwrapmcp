@@ -8,6 +8,13 @@ Example: ask EverWrap to find past notes about feeling stuck in a role that does
 not fit your strengths. Different wording and languages can produce different
 results. Relevant saved articles are not necessarily your own experiences.
 
+Both personal writing and saved references belong in problem-solving results.
+Use personal entries to understand the situation, goals, and past attempts; use
+saved material to propose relevant methods, alternatives, and decision steps.
+Connect the two with source references. The distinction guides interpretation,
+not exclusion: saving an article does not prove agreement with it or that its
+author's experience happened to the user. If provenance is unclear, say so.
+
 ## Tool contract
 
 Arguments: `query` (1–500 nonblank characters), `limit` (1–10, default 3).
