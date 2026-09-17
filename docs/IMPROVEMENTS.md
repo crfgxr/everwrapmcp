@@ -85,6 +85,37 @@ synthetic warm timing is not an end-to-end performance promise. Bound parallelis
 and retries, and use aggregate timings/counts without retaining source text or
 private IDs. Avoid automatic fan-out across every retrieval tool.
 
+### Latency experiments, in order
+
+1. **Establish the breakdown:** measure connection/OAuth setup, Evernote search,
+   local masking and serialization separately. Record cold/warm p50 and p95 over
+   multiple runs, result sizes and failures. One slower first call does not prove
+   model startup is the cause; network and authorization can dominate.
+2. **Reuse expensive initialization:** models already stay loaded in the process.
+   Measure remaining cold cost and evaluate safe warm-up without reading notes.
+   Investigate upstream client/session reuse with proper expiry, cancellation and
+   shutdown handling. Do not assume connection reuse is implemented already.
+3. **Reduce repeated work:** evaluate the policy-aware memory cache described
+   above for subsequent pages. Keep only necessary data for a short, bounded
+   lifetime; caching raw note text increases exposure and must be assessed.
+4. **Bound retrieval:** use snippets first and fetch full-note context only when
+   necessary. Measure semantic over-fetch and candidate diversity before reducing
+   candidates; fewer requests or shorter excerpts can also lose useful evidence.
+5. **Batch local inference:** benchmark several small passages together and bound
+   CPU concurrency. Preserve exact per-passage offsets, complete token coverage
+   and block filtering before inference. Avoid oversubscribing the machine.
+6. **Evaluate alternative runtimes only if inference dominates:** compare a
+   smaller model, quantization or an optimized CPU runtime against the same held-out
+   privacy/readability corpus. A faster model is unacceptable if it materially
+   increases missed sensitive spans. Check new dependencies before adopting them.
+7. **Keep the interaction responsive:** enforce stage timeouts and cancellation;
+   report a static progress/error message without streaming unmasked text. Retries
+   must be bounded and appropriate to the error, not repeat expensive work blindly.
+
+Select targets after measuring the baseline. Report latency alongside retrieval
+quality, missed-sensitive-span rate, false positives, memory and token estimates.
+These are proposed experiments, not implemented speedups or guaranteed savings.
+
 ## Dependency and deployment gaps
 
 The dated [dependency audit](DEPENDENCY_SECURITY.md) covers the installed macOS
