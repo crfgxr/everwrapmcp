@@ -76,9 +76,9 @@ The ChatGPT tunnel route below is a separate, unverified advanced setup.
 ## Sharing status
 
 The README and agent setup path are ready for collaborators to try. Public launch
-still needs repository access to be opened deliberately, an explicit project
-license, and a clean-machine onboarding test. No project license is included yet;
-this is currently a private preview, not a released open-source package. Only
+still needs repository access to be opened deliberately and a clean-machine
+onboarding test. The code is MIT-licensed; distribution is currently a private
+preview. Only
 Codex has live integration evidence; Claude and ChatGPT remain unverified here.
 The privacy model is best-effort masking plus a local block list, not a guarantee
 that every sensitive detail is removed. [Known gaps and priorities](docs/IMPROVEMENTS.md).
@@ -142,3 +142,10 @@ Independent prototype; not affiliated with Evernote. This is not an OS security 
 [Results](docs/RESULTS.md) · [Redaction details](docs/REDACTION.md) · [Access policy and tests](docs/SINGLE_NOTE_TEST.md)
 
 [Improvement priorities, duplication, and open questions](docs/IMPROVEMENTS.md).
+
+## License
+
+EverWrap’s original code and documentation are available under the [MIT License](LICENSE).
+You may use, modify and redistribute them, including commercially, while retaining
+the license notice. Third-party packages and model weights retain their own licenses;
+Evernote service access is separate.

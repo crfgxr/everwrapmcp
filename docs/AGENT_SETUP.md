@@ -13,8 +13,8 @@ integration is verified until the target client actually calls the wrapper.
   paths for client registration. Do not put a checkout in a disposable temp folder.
 - Inspect existing configuration before changing it. Merge the EverWrap entry;
   preserve unrelated servers and never overwrite an existing private policy.
-- The repository is currently private and has no project license file. Do not
-  change visibility, invent permissions or claim it is a released public package.
+- The repository is currently private; its original code is MIT-licensed. Do not
+  change visibility or claim it is a released public package.
 
 ## Install and configure
 
@@ -65,7 +65,7 @@ explicitly established; installation is not an account-wide retrieval request.
 
 ## Before a public launch
 
-Choose and add an explicit project license; review dependencies/model licenses;
+The project MIT license is in place. Review dependencies/model licenses;
 review tracked files and Git history for private data; verify a fresh macOS
 installation from the documented commands; then deliberately decide repository
 visibility. Test other clients before promoting them as working integrations.
