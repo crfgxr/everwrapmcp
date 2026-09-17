@@ -150,3 +150,21 @@ has not been validated and should not enable broader access on the assumption
 that language identification is enough. Keep initial testing to a synthetic note.
 Optional, separately validated language packs are a planned improvement.
 
+
+## Adding another language
+
+The architecture can be extended. Lingua can identify many languages, but
+identification alone does not recognize sensitive names, addresses or identifiers.
+EverWrapMCP currently configures its language routing and masking for English and
+Turkish. Installing Lingua does not automatically enable all its languages here.
+
+A developer or coding agent can add a language by implementing its routing,
+integrating a suitable local NER model and localized rules, and validating both
+privacy and readability. A shared multilingual model is also an option to evaluate.
+Check model licenses, package vulnerabilities, memory use and latency, and test
+mixed-language and unsupported-language behavior before claiming support.
+
+This requires code and tests today, not simply a configuration flag. During setup,
+tell your agent which languages you need so it can explain existing coverage or
+scope an extension. Do not enable unvalidated masking as if it were proven.
+[Language roadmap](IMPROVEMENTS.md#additional-languages-proposed-not-enabled).

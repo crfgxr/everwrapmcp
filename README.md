@@ -66,8 +66,10 @@ A repository link alone does not connect an ordinary web chat to your notes.
 
 ## What setup asks you
 
-1. **Your app and note languages.** English and Turkish are installed together;
-   other languages are not supported yet.
+1. **Your app and note languages.** English and Turkish masking comes installed.
+   Developers can add other languages by integrating suitable detection models
+   and rules, then testing them; there is no install-time language selector yet.
+   [How language support can be extended](docs/ONBOARDING.md#adding-another-language).
 2. **A fictional test note.** Start with access to just that note.
 3. **Which notes to block.** Provide internal note links or IDs, not their contents.
 4. **Read-only sign-in.** Complete Evernote authorization in your browser.
