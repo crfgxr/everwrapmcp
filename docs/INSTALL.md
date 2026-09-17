@@ -44,7 +44,7 @@ placeholder with that note's GUID and setting `content_mode` to `redacted`:
 }
 ```
 
-To obtain the link, see [the Mac menu-bar and shortcut steps](../README.md#choose-the-notes-to-block).
+To obtain the link, see [the Mac menu-bar and shortcut steps](ONBOARDING.md#choose-the-notes-to-block).
 Use Copy internal link, not public sharing.
 
 For an internal link shaped like `evernote:///view/ACCOUNT/SHARD/NOTE_GUID/OTHER_GUID`,

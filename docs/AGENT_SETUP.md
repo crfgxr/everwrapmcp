@@ -4,7 +4,7 @@ This guide is for a local coding agent helping a new user install EverWrapMCP. R
 [INSTALL.md](INSTALL.md) for commands and client configuration. Do not claim an
 integration is verified until the target client actually calls the wrapper.
 
-Use the [fictional onboarding and before/after examples](../README.md#what-onboarding-looks-like)
+Use the [fictional onboarding and before/after examples](ONBOARDING.md#what-onboarding-looks-like)
 to explain the experience. Example assistant answers are illustrations: never
 report them as successful checks without actual tool evidence.
 
@@ -41,7 +41,7 @@ models and recognizers together, not merely the language identifier.
 
 ## Ask about blocked notes before broader access
 
-Ask which notes must be excluded, using [the README link/ID instructions](../README.md#choose-the-notes-to-block).
+Ask which notes must be excluded, using [the README link/ID instructions](ONBOARDING.md#choose-the-notes-to-block).
 Offer internal links, exact UUIDs, or direct editing of the private local policy.
 Never request the contents of an excluded note. If only a title is given, ask the
 user to locate it in Evernote and copy its internal link; do not use account-wide
