@@ -133,6 +133,73 @@ permissions, local policy file access and client setup are separate controls.
 Search block filtering protects what reaches the client; it does not prevent
 Evernote from indexing or internally searching blocked material.
 
+## Reddit feedback: stronger boundaries and auditability — proposed
+
+Added 2026-09-18 after public feedback on the r/Evernote preview post. These are
+proposals, not claims that the features exist today.
+
+### 1. Notebook-level default-deny
+
+Add an optional policy mode where selected notebooks are default-deny: every note
+in those notebooks is blocked unless its ID is explicitly allowed. Keep the current
+note-ID allowlist and block list working exactly as they do now; notebook rules
+must be an additional layer, never a replacement.
+
+**Why:** notebook rules scale better for large libraries and match how people
+naturally organize sensitive material.
+
+**Evidence needed before declaring success:** controlled tests proving notebook
+denial happens before network access, block precedence beats allowlists, notebook
+membership is revalidated on the fetched note (not just in search results), and
+notes moved between notebooks are handled safely.
+
+### 2. Deterministic-first redaction pipeline
+
+Expand the existing shared deterministic patterns and checksum recognizers so that
+obvious secrets never depend on model inference. Today, deterministic secret and
+credential recognizers already run across the full window; this proposal makes
+deterministic-first handling an explicit architectural guarantee and extends it to
+encoded, obfuscated, and attachment/OCR-derived text.
+
+**Why:** if a model misses a name, that is bad; if a regex misses a token, that is
+a concrete bug that can be fixed deterministically.
+
+**Evidence needed before declaring success:** held-out tests for encoded secrets,
+base64/URL/hex-encoded keys, OCR text from images, attachment references, and
+indirect note references (note A pointing to blocked note B). Verify deterministic
+detection runs before any NLP model and that its output still cannot be overridden
+by downstream inference.
+
+### 3. Local redaction preview
+
+Add a local preview mode that shows the user exactly which spans were removed and
+why (entity type, recognizer, source offset), without exposing the underlying
+sensitive text. The preview must be opt-in, local-only, and never sent to the AI
+client.
+
+**Why:** people cannot trust a redactor they cannot inspect. A preview showing
+"this sentence lost 2 spans: PERSON, PHONE_NUMBER" would make the tool feel
+transparent without leaking content.
+
+**Evidence needed before declaring success:** preview shows placeholder category
+and reason, never raw values; works on reads, search snippets, and semantic search
+results; does not break response size limits; and cannot be invoked by a tool
+argument from the AI client.
+
+### 4. Expanded adversarial test categories
+
+Add explicit adversarial test coverage for:
+
+- Encoded and obfuscated secrets (base64, URL-encoded, hex, unicode-normalized)
+- Attachment and OCR-derived text
+- Indirect note references (a note containing a link or mention of another note)
+- Notebook scoping edge cases (moves, renames, membership changes)
+- Cross-notebook search results containing blocked material
+
+**Evidence needed before declaring success:** these tests pass independently of
+the NLP fixtures, and failures are treated as release blockers, not readability
+tuning.
+
 ## Hosting and easier onboarding — proposed
 
 Added 2026-09-18. A likely user question is: "Can I use a hosted version instead
