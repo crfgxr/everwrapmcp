@@ -133,6 +133,49 @@ permissions, local policy file access and client setup are separate controls.
 Search block filtering protects what reaches the client; it does not prevent
 Evernote from indexing or internally searching blocked material.
 
+## Hosting and easier onboarding — proposed
+
+Added 2026-09-18. A likely user question is: "Can I use a hosted version instead
+of installing models on my computer?" Treat this as a product hypothesis to
+validate, not an announced service or supported deployment.
+
+Compare three options:
+
+| Option | User benefit | Tradeoff |
+| --- | --- | --- |
+| Local wrapper with an authenticated remote connection | Keep masking on the user's device while connecting a remote AI client. | The device must stay online; secure connectivity and client compatibility still need testing. |
+| Self-hosted, single-user instance | Run the wrapper on a server the user controls, with an always-on connection. | The user operates and updates the server; raw allowed-note content and credentials are processed there. |
+| Managed hosting | Minimize installation and model maintenance for users. | The hosting operator becomes an additional trust boundary and processes raw allowed-note content before masking. |
+
+Prefer evaluating single-user self-hosting first. Keep local installation as an
+option. A tunnel to a local process and a remotely hosted masking service are
+different architectures; explain where raw text is processed in each. Do not
+market hosted masking as "your notes never leave your device."
+
+Before calling any hosted option supported:
+
+- Verify the remote MCP transport and authentication required by each target
+  client. Require authenticated, encrypted access; do not expose an open endpoint.
+- Separate client access credentials from Evernote OAuth credentials. Keep
+  read-only consent, secure storage, refresh, revocation and account disconnect.
+- Preserve block-list enforcement and masking across search, reads, pagination
+  and errors. Keep policy changes under the user's control, outside model tools.
+- Document content handling: no raw note text, tokens or private identifiers in
+  logs; bounded memory/cache lifetime; explicit retention and deletion behavior.
+- For managed hosting, prove isolation of credentials, policies, caches and
+  responses between users, including concurrent requests and failure recovery.
+- Measure cold starts, model memory, warm latency and per-user operating cost.
+  Load only selected language packs and bound request sizes and concurrency.
+- Provide reproducible deployment, dependency updates, health checks and rollback.
+  Recheck third-party model licenses for the intended distribution and hosting.
+- Test with fictional notes: blocked content never returned, masking failures
+  withhold output, revoked access stops working, and no cross-account disclosure.
+
+Ask interested users which client they use, whether an always-on local device is
+acceptable, and whether they prefer their own server or trusting a hosting
+provider. Use that feedback to decide whether hosting removes enough setup friction
+to justify its operational cost and changed privacy model.
+
 ## Later: local index or graph
 
 No local graph, persistent note index or automatic cross-note memory exists yet.
