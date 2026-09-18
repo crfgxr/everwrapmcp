@@ -18,10 +18,15 @@ from everwrap.setup import save_languages
     ('darwin', 'keyring.backends.macOS', 'Keyring'),
 ])
 def test_explicit_backend(monkeypatch, platform, module, attribute):
-    backend = object()
+    backend = SimpleNamespace()
     monkeypatch.setattr(sys, 'platform', platform)
     monkeypatch.setitem(sys.modules, module, SimpleNamespace(**{attribute: lambda: backend}))
-    assert secure_keyring() is backend
+    selected = secure_keyring()
+    if platform == 'win32':
+        assert selected.backend is backend
+        assert backend.persist == 'local machine'
+    else:
+        assert selected is backend
 
 
 def test_unsupported_platform_fails_closed(monkeypatch):
@@ -98,3 +103,22 @@ def test_windows_vault_roundtrip_and_delete():
         if backend.get_password(service, 'synthetic') is not None:
             backend.delete_password(service, 'synthetic')
     assert backend.get_password(service, 'synthetic') is None
+
+
+@pytest.mark.skipif(os.name != 'nt', reason='Windows large OAuth record integration')
+def test_windows_vault_large_record_refresh_and_restart():
+    backend = secure_keyring()
+    service = 'EverWrap:test:' + str(uuid.uuid4())
+    first = 'fictional-OAuth-record-🙂' * 400
+    second = 'fictional-refreshed-record-ş' * 500
+    try:
+        backend.set_password(service, 'tokens', first)
+        backend.set_password(service, 'client', 'fictional-client')
+        assert secure_keyring().get_password(service, 'tokens') == first
+        backend.set_password(service, 'tokens', second)
+        assert secure_keyring().get_password(service, 'tokens') == second
+        assert secure_keyring().get_password(service, 'client') == 'fictional-client'
+    finally:
+        for username in ('tokens', 'client'):
+            if backend.backend.get_password(service, username) is not None:
+                backend.delete_password(service, username)

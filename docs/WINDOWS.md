@@ -57,6 +57,14 @@ Complete read-only Evernote consent in your browser on this computer. The callba
 listens on `127.0.0.1:8766`. Tokens and OAuth client information go to Windows
 Credential Manager under service `EverWrap:official-evernote-mcp`.
 
+Windows limits each credential blob to [2560 bytes](https://learn.microsoft.com/en-us/windows/win32/api/wincred/ns-wincred-credentialw).
+Large OAuth records are stored as bounded chunks, all encrypted by Credential
+Manager, with a generation and checksum manifest. New chunks are written before
+the manifest replaces the previous record, so an interrupted write preserves the
+previous grant. Missing or corrupt chunks are rejected. Records remain on this
+machine; no plaintext token file or roaming credential fallback is used. Existing
+single-record credentials are readable and migrate on their next update.
+
 Configure your MCP client with the absolute `.venv/Scripts/python.exe` path,
 arguments `-m everwrap.server`, and `PYTHONPATH` pointing to this checkout's `src`.
 The stdio process is started by the client; it is not an HTTP service.
@@ -68,10 +76,11 @@ credential-store and callback tests alone do not prove a live Evernote connectio
 
 ## Checks
 
-Local Windows verification on 2026-09-18: **80 core tests passed**, including
+Local Windows verification on 2026-09-18: **96 core tests passed**, including
 native protected-DACL inspection after policy replacement, Credential Manager
 write/read/delete, loopback OAuth callback validation, and subprocess stdio tool
-discovery/denial. This does not verify live Evernote authorization or model-based
+discovery/denial, large Unicode credential roundtrips, refresh/reopen, interrupted
+writes, corruption rejection and legacy migration. This does not verify live Evernote authorization or model-based
 masking; those remain separate installation checks.
 
 ```powershell
@@ -84,6 +93,7 @@ write/read/delete a uniquely named fictional credential and verify policy ACLs
 after replacement. They never read existing credentials or Evernote notes.
 
 To remove this installation, first remove its MCP entry from your client, then
-remove only its `EverWrap:official-evernote-mcp` credentials using Windows
+remove only its `EverWrap:official-evernote-mcp` credentials and corresponding
+`EverWrap:official-evernote-mcp:chunks:` entries using Windows
 Credential Manager. Remove the checkout and its local models when no longer
 needed. Never clear unrelated credentials.
