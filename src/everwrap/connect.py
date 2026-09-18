@@ -21,13 +21,14 @@ from pydantic import AnyUrl
 
 from .policy import SingleNotePolicy
 from .credentials import secure_keyring
+from .oauth_refresh import PersistedRefreshMixin
 
 SERVER_URL = "https://mcp.evernote.com/mcp"
 CALLBACK_URL = "http://127.0.0.1:8766/callback"
 KEYCHAIN_SERVICE = "EverWrap:official-evernote-mcp"
 
 
-class ReadOnlyOAuthProvider(OAuthClientProvider):
+class ReadOnlyOAuthProvider(PersistedRefreshMixin, OAuthClientProvider):
     """Pin consent to read, including after the SDK's scope discovery.
 
     MCP SDK 2.2.0 overwrites client_metadata.scope using advertised scopes.

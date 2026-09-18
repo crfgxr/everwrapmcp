@@ -76,12 +76,24 @@ credential-store and callback tests alone do not prove a live Evernote connectio
 
 ## Checks
 
-Local Windows verification on 2026-09-18: **96 core tests passed**, including
+Local Windows verification on 2026-09-18: **106 core tests passed**, including
 native protected-DACL inspection after policy replacement, Credential Manager
 write/read/delete, loopback OAuth callback validation, and subprocess stdio tool
 discovery/denial, large Unicode credential roundtrips, refresh/reopen, interrupted
-writes, corruption rejection and legacy migration. This does not verify live Evernote authorization or model-based
-masking; those remain separate installation checks.
+writes, corruption rejection and legacy migration. OAuth regression tests cover
+expired persisted tokens, refresh without repeat consent, transient failures,
+rejected refresh grants, issuer/endpoint validation, and read-only scope enforcement.
+
+A live expired read-only grant was successfully refreshed and tool metadata was
+retrieved without opening another consent page. English and Turkish synthetic
+masking checks also passed locally. These checks do not prove real-note retrieval
+or masking accuracy on every note.
+
+When a saved access token receives HTTP 401, EverWrap tries one refresh against
+the stored credential's validated Evernote issuer before allowing the SDK's
+interactive setup flow. Temporary refresh failures preserve the saved grant;
+rejected refresh grants still require connection setup. Write access is never
+requested or accepted.
 
 ```powershell
 & ./.venv/Scripts/python.exe -m pytest --ignore=tests/test_release_gate.py -q
