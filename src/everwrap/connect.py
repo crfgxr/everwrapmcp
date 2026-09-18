@@ -1,7 +1,7 @@
 """Authenticate to official Evernote MCP and inspect get_note's schema only.
 
 This setup command has no call_tool or resource-read path. It cannot read notes.
-Tokens stay in the macOS Keychain, not source/configuration files or stdout.
+Tokens stay in the OS credential store, not configuration files or stdout.
 """
 
 import asyncio
@@ -13,7 +13,6 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
 import httpx2
-from keyring.backends.macOS import Keyring
 from mcp import Client
 from mcp.client.auth import AuthorizationCodeResult, OAuthClientProvider
 from mcp.client.streamable_http import streamable_http_client
@@ -21,6 +20,7 @@ from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata, OAu
 from pydantic import AnyUrl
 
 from .policy import SingleNotePolicy
+from .credentials import secure_keyring
 
 SERVER_URL = "https://mcp.evernote.com/mcp"
 CALLBACK_URL = "http://127.0.0.1:8766/callback"
@@ -49,7 +49,7 @@ def require_read_only(tokens):
 class KeychainStore:
     def __init__(self):
         # Explicit backend: never silently falls back to plaintext token storage.
-        self._keyring = Keyring()
+        self._keyring = secure_keyring()
 
     async def get_tokens(self):
         value = await asyncio.to_thread(self._keyring.get_password, KEYCHAIN_SERVICE, "tokens")
@@ -110,7 +110,7 @@ class LoopbackCallback:
         except Exception:
             opened = False
         print("Complete Evernote sign-in in the browser." if opened else
-              "Open the link above on this Mac to complete sign-in.", flush=True)
+              "Open the link above on this computer to complete sign-in.", flush=True)
 
     async def wait(self):
         return await asyncio.wait_for(self.result, timeout=600)

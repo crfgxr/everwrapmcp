@@ -11,6 +11,7 @@ import tempfile
 from .policy import SingleNotePolicy
 
 from .packs import PACKS, validate_languages
+from .private_files import restrict_file
 
 
 def save_languages(path, languages, original):
@@ -29,6 +30,7 @@ def save_languages(path, languages, original):
     fd, name = tempfile.mkstemp(prefix=".everwrap-policy-", dir=path.parent)
     try:
         with os.fdopen(fd, "wb") as stream:
+            restrict_file(Path(name))
             stream.write(payload)
         SingleNotePolicy.from_file(Path(name))
         if path.read_bytes() != original:
@@ -51,6 +53,9 @@ def main():
         print("Available packs: " + ", ".join(f"{pack['name']} ({code})" for code, pack in PACKS.items()))
         print("Packs have synthetic regression coverage, not guaranteed detection.")
         print("Choose all languages present in your notes, including mixed notes.")
+        print("Other languages: for example French (fr), German (de), Spanish (es), "
+              "or a combination such as en tr fr. Enter the language codes below.")
+        print("Languages outside en, tr, fr, de, es need additional masking support.")
         values = input("Languages [en tr]: ").strip().lower().replace(",", " ").split() or ["en", "tr"]
     try:
         languages = validate_languages(values)

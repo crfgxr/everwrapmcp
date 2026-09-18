@@ -121,3 +121,21 @@ def test_broader_or_unidentified_token_grants_are_rejected(scope):
 def test_read_only_token_is_accepted():
     token = OAuthToken(access_token="synthetic", token_type="Bearer", scope="read")
     assert require_read_only(token) is token
+
+
+def test_loopback_listener_accepts_matching_callback():
+    async def run():
+        callback = LoopbackCallback()
+        callback.expected_state = 'fictional-state'
+        listener = await asyncio.start_server(callback.handle, '127.0.0.1', 0)
+        async with listener:
+            port = listener.sockets[0].getsockname()[1]
+            reader, writer = await asyncio.open_connection('127.0.0.1', port)
+            writer.write(b'GET /callback?code=fictional-code&state=fictional-state HTTP/1.1\r\nHost: localhost\r\n\r\n')
+            await writer.drain()
+            response = await asyncio.wait_for(reader.read(), timeout=5)
+            writer.close()
+            await writer.wait_closed()
+            assert response.startswith(b'HTTP/1.1 200 OK')
+            assert (await callback.wait()).code == 'fictional-code'
+    asyncio.run(run())

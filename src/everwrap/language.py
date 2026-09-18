@@ -1,5 +1,6 @@
 """Local language routing and selected NER models; no downloads during note access."""
 import re
+import os
 from pathlib import Path
 
 from .service import ProcessingBlocked
@@ -9,7 +10,8 @@ MODEL_ID = "akdeniz27/bert-base-turkish-cased-ner"
 MODEL_REVISION = "99995f7d2be4b3a28c74f0d36ee97f8c04ee0571"
 MODEL_FILES = ["config.json", "model.safetensors", "tokenizer.json",
                "tokenizer_config.json", "special_tokens_map.json", "vocab.txt"]
-MODEL_PATH = Path.home() / ".cache" / "everwrap" / MODEL_REVISION
+MODEL_PATH = ((Path(__file__).resolve().parents[2] / ".models") if os.name == "nt"
+              else Path.home() / ".cache" / "everwrap") / MODEL_REVISION
 
 
 def setup_model():

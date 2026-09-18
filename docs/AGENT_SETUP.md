@@ -10,7 +10,7 @@ report them as successful checks without actual tool evidence.
 
 ## Establish the environment
 
-- Check macOS, repository access, Git, uv and the intended client. Only the Codex
+- Check macOS or Windows, repository access, Git, uv and the intended client. Only the Codex
   integration has been tested live in this project. Do not silently substitute
   another client or expose a public server to make an unsupported setup work.
 - Use a stable checkout location chosen with the user's context. Record absolute
@@ -23,6 +23,9 @@ report them as successful checks without actual tool evidence.
 ## Ask about note languages
 
 Ask: “Which languages do your notes contain? Do you mix languages within a note?”
+When offering quick choices, include **Other languages — for example French,
+German, Spanish, or any combination**, alongside Turkish and English options.
+Never restrict the question to Turkish and English. Accept free-text selections.
 Offer English, Turkish, Spanish, French, German, or any combination. Ask about
 other languages too so gaps are visible.
 Use an answer already supplied by the user; do not ask repeatedly. After creating
@@ -61,12 +64,12 @@ block list from no response. A user can explicitly choose no exclusions.
    first note UUID from its internal link. Keep it only in the ignored local
    policy. Start with single_note access and redacted content. Leave access
    disabled if required user input is missing; never substitute a real note.
-3. Keep the policy file private (mode 600), ignored and untracked. Preserve any
+3. Keep the policy file private (mode 600 on macOS; protected owner/System DACL on Windows), ignored and untracked. Preserve any
    existing block list. Policy changes must reflect the user's requested scope;
    passing a test is not authorization to enable account-wide access.
 4. Run the wrapper's read-only OAuth flow. The user completes the browser sign-in
    and consent. Do not request credentials in chat, copy tokens into configuration,
-   or print Keychain contents. Never authenticate a direct Evernote connector as a
+   or print credential-store contents. Never authenticate a direct Evernote connector as a
    fallback for the wrapper.
 5. Register EverWrapMCP using the chosen client's instructions and absolute paths.
    Confirm which reload/restart action is available; do not invent an MCP restart

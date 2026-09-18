@@ -1,7 +1,8 @@
 # Install EverWrapMCP
 
-EverWrapMCP currently runs on **macOS** and uses macOS Keychain for Evernote credentials.
-Native Windows/Linux and a one-click extension package are not supported by this build.
+EverWrapMCP uses **macOS Keychain** or **Windows Credential Manager** for Evernote credentials.
+Windows support is experimental: start with the [PowerShell setup guide](WINDOWS.md).
+Native Linux and a one-click extension package are not supported by this build.
 Evernote’s remote MCP service does not impose this macOS restriction; the wrapper
 does. [Windows requirements and pitfalls](CLIENT_COMPATIBILITY.md#windows-upstream-compatibility-versus-wrapper-support).
 The repository is public and MIT-licensed; collaborator access is not required.
@@ -98,7 +99,7 @@ PYTHONPATH=src .venv/bin/python -m everwrap.connect
 Approve read-only access in the browser. If it doesn't open, use the link printed
 by the command on the same Mac. Successful setup prints `Connected. No notes were
 read.` and the read-tool schema. The callback uses `127.0.0.1:8766`; leave the command
-running until it completes. Tokens are stored in macOS Keychain, not the JSON file.
+running until it completes. Tokens are stored in the OS credential store, not the JSON file.
 [Evernote's official MCP guide](https://dev.evernote.com/mcp) describes account access
 and OAuth. There is no Evernote API key to paste into the client configuration.
 

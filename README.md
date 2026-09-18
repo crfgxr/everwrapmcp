@@ -6,7 +6,7 @@ Some notes should never reach your AI assistant. Others are useful, but contain
 names, contact details or secrets. EverWrapMCP adds a private block list and local
 masking between Evernote and your assistant. Your original notes stay unchanged.
 
-**Preview release · macOS · read-only · Languages (English, Turkish, Spanish, French, German) · MIT code**
+**Preview release · macOS + experimental Windows · read-only · Languages (English, Turkish, Spanish, French, German) · MIT code**
 
 ```text
 Evernote → EverWrapMCP on your Mac → your AI assistant
@@ -16,8 +16,8 @@ Evernote → EverWrapMCP on your Mac → your AI assistant
 It connects to [Evernote’s official MCP server](https://dev.evernote.com/mcp).
 MCP is the protocol that lets an AI assistant use external tools and data.
 
-**Windows:** Evernote’s remote service is client-based; this wrapper’s native
-Windows support is not implemented yet. [Current blockers and pitfalls](docs/CLIENT_COMPATIBILITY.md#windows-upstream-compatibility-versus-wrapper-support).
+**Windows:** Native credential storage and a PowerShell installer are available
+in this experimental implementation. [Windows setup and verification limits](docs/WINDOWS.md).
 
 ## See the difference
 
@@ -41,7 +41,7 @@ For a blocked note, the wrapper denies access and returns no content.
 
 ## Get started
 
-You need a Mac, an Evernote account with MCP access, and a compatible client.
+You need macOS or Windows, an Evernote account with MCP access, and a compatible client.
 **Codex is not required**, but it is the only client tested live with this project.
 
 | Client | Setup and status |
@@ -69,7 +69,7 @@ A repository link alone does not connect an ordinary web chat to your notes.
 
 ## What setup asks you
 
-1. **Your app and note languages.** Choose any combination of **English, Turkish, Spanish, French, and German**. Setup installs and tests the selected masking packs; routing is automatic during use.
+1. **Your app and note languages.** Choose Turkish and English, or **different languages — for example French, German, Spanish, or any combination of the five supported languages**. Setup installs and tests the selected masking packs; routing is automatic during use.
    Other languages need additional models, rules and validation. Unsupported or
    uncertain passages are withheld; language detection is not a privacy guarantee.
    [Language packs and coverage](docs/ONBOARDING.md#adding-another-language).

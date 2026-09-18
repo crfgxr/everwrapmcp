@@ -1,5 +1,6 @@
 """Selection, installation boundaries and fail-closed language coverage."""
 import builtins
+import os
 import json
 import stat
 import sys
@@ -44,7 +45,8 @@ def test_policy_update_preserves_private_settings(tmp_path):
     assert SingleNotePolicy.from_file(path).languages == ('en','tr')
     save_languages(path, ('en',), original)
     assert json.loads(path.read_text()) == data | {'languages':['en']}
-    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    if os.name != 'nt':
+        assert stat.S_IMODE(path.stat().st_mode) == 0o600
     with pytest.raises(ValueError):
         save_languages(path, ('tr',), original)
     assert SingleNotePolicy.from_file(path).languages == ('en',)
