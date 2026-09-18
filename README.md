@@ -8,10 +8,7 @@ masking between Evernote and your assistant. Your original notes stay unchanged.
 
 **Preview release · macOS + experimental Windows · read-only · Languages (English, Turkish, Spanish, French, German) · MIT code**
 
-```text
-Evernote → EverWrapMCP on your Mac → your AI assistant
-                 block + mask
-```
+![EverWrapMCP: blocked notes stay out of AI responses, while allowed notes have detected sensitive details masked.](docs/assets/everwrap-social-alternative-a.png)
 
 It connects to [Evernote’s official MCP server](https://dev.evernote.com/mcp).
 MCP is the protocol that lets an AI assistant use external tools and data.
