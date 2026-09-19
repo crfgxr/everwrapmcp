@@ -94,6 +94,24 @@ The user completes browser sign-in; the agent reports actual test results.
 
 </details>
 
+## Where the trust boundary sits
+
+MCP places the consent and data-handling duties on the **host** — the client that
+runs the assistant. The host is responsible for getting your consent before
+exposing your data to a server and for not sending it onward without your
+agreement. It is also supposed to treat tool descriptions as untrusted unless
+they come from a server it trusts.
+
+EverWrapMCP volunteers to be that trusted local server for your Evernote data. It
+is the component that decides what leaves your machine, so those duties are
+enforced in one place you can read, test and audit. That is the reason the block
+list and masking run in a local process you control, and why the wrapper keeps the
+policy file, credentials and note IDs on your machine.
+
+It also means the boundary only holds while the assistant connects through the
+wrapper. A second, direct Evernote connection in the same client bypasses these
+controls entirely. [Client options and limits](docs/CLIENT_COMPATIBILITY.md).
+
 ## Know the limits
 
 Masking is **best-effort**: it can miss sensitive details or mask harmless words.
