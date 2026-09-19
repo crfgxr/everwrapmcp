@@ -120,9 +120,24 @@ bypasses the wrapper. Keep note IDs, credentials and your block list private.
 Model wheels are third-party downloads and were not assessed by the advisory scan;
 use the pinned official sources. [Model warnings and licenses](docs/LANGUAGE_PACKS.md).
 
+### Not covered yet
+
+These gaps are known and tracked. Treat them as open, not as solved.
+
+| Area | Current behavior | Status |
+| --- | --- | --- |
+| Attachments and embedded files | Attachment data is never fetched or returned. Attachment references are dropped from the flattened text. | No attachment scanning; attached content is neither read nor masked. |
+| Images and OCR text | Image bytes are not read. Text that Evernote itself has already placed into the note is handled like any other text. | No OCR or image-text extraction; text visible only inside an image is not seen. |
+| Encoded or obfuscated secrets | Deterministic secret and credential recognizers run across the full text window before the language models. | Plain forms are covered best-effort; heavily encoded, split or transformed secrets may still be missed. |
+| Indirect note references | Notes are fetched by ID and each note is authorized on its own. A note that mentions or links to another note is not followed. | A reference is not resolved, and it does not grant access. A blocked note stays blocked. |
+| Notebook-level rules | Access is enforced by note ID with a block list that always wins. | Notebook-level default-deny rules are not implemented; see the roadmap. |
+| Redaction preview | Detected spans are replaced with typed placeholders such as `[PERSON]` and `[SECRET]`. | There is no UI that shows what was removed and why. |
+| Guarantees | Failures block the response instead of falling back to raw text. | Detection is probabilistic for names and addresses. No claim of complete PII removal. |
+
+[Roadmap for these items](docs/IMPROVEMENTS.md) · [Full privacy details](docs/REDACTION.md)
+
 This preview release is not a security sandbox or a one-click product. A fresh-Mac
 onboarding test and live verification of other clients remain outstanding.
-[Privacy details](docs/REDACTION.md) · [Known gaps](docs/IMPROVEMENTS.md)
 
 ## For contributors
 
