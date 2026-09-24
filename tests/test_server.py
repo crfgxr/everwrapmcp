@@ -32,6 +32,8 @@ def test_protocol_exposes_only_safe_tools_and_denies_all_content():
             assert {t.name for t in listing.tools} == {"read_safe_note", "search_safe_notes", "semantic_search_safe_notes"}
             for tool in listing.tools:
                 assert tool.input_schema["additionalProperties"] is False
+                assert "Evernote" in tool.description
+                assert "EverWrapMCP" in tool.description
             for name, arguments, message in [
                 ("read_safe_note", {"note_id": NOTE_ID}, "Content blocked"),
                 ("read_safe_note", {"note_id": OTHER_ID}, "Request denied"),
@@ -54,6 +56,10 @@ def test_protocol_exposes_only_safe_tools_and_denies_all_content():
         capabilities = server.create_initialization_options().capabilities
         assert capabilities.resources is None
         assert capabilities.prompts is None
+        initialization = server.create_initialization_options()
+        assert initialization.server_name == "EverWrapMCP"
+        assert "when a user asks" in initialization.instructions
+        assert "Evernote notes" in initialization.instructions
     asyncio.run(check())
 
 

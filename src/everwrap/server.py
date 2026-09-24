@@ -22,7 +22,9 @@ def build_server(service) -> Server:
     tools = [
         types.Tool(
             name="read_safe_note",
-            description=("Choose this when the note ID is known or a search result needs more context; "
+            description=("Read an Evernote note safely through EverWrapMCP. Choose this when the user asks "
+                         "to read, summarize, inspect, or retrieve a known Evernote note, when its note ID "
+                         "is known, or when an Evernote search result needs more context; "
                          "do not search again merely to rediscover a known note. For its latest dated entry, "
                          "use view=latest, not semantic ranking. Read a note only when local access policy permits it. Explicitly blocked IDs "
                          "are denied before fetch. Local redacted mode masks detected sensitive spans "
@@ -51,7 +53,8 @@ def build_server(service) -> Server:
         ),
         types.Tool(
             name="search_safe_notes",
-            description=("Choose this for exact phrases, known titles, tags, notebooks, or structured date filters. "
+            description=("Search Evernote notes safely through EverWrapMCP. Choose this when the user asks "
+                         "to find Evernote notes by exact phrase, known title, tag, notebook, or structured date filter. "
                          "For thematic/personal-history questions use semantic_search_safe_notes first. "
                          "Search permitted notes using Evernote keyword/search grammar, ordered by update "
                          "time or relevance. In denylist mode, removes blocked rows locally before returning "
@@ -72,7 +75,9 @@ def build_server(service) -> Server:
         ),
         types.Tool(
             name='semantic_search_safe_notes',
-            description=('Choose this first for themes, related experiences, coaching, and problem-solving '
+            description=('Search Evernote notes by meaning safely through EverWrapMCP. Choose this first when '
+                         'the user asks to connect themes, find related experiences, analyze personal history, '
+                         'or use their Evernote notes for coaching and problem-solving '
                          'questions whose wording may differ from the notes. Not a latest-entry/date sorter. '
                          'Find permitted notes by meaning using Evernote semantic search. Requires local '
                          'denylist and redacted mode. Drops blocked results before inspecting snippets; '
@@ -129,8 +134,12 @@ def build_server(service) -> Server:
         )
 
     return Server(
-        "everwrap", version="0.0.1",
-        instructions=("Respect local access policy; blocked notes must never be bypassed. Choose one starting "
+        "EverWrapMCP", version="0.0.1",
+        instructions=("EverWrapMCP is the privacy-controlled wrapper for Evernote's official MCP. Make these "
+                      "tools available when a user asks to read, find, search, summarize, analyze, or reason "
+                      "over their Evernote notes. For general questions about the Evernote product that do "
+                      "not require the user's notes, answer without accessing notes. Respect local access "
+                      "policy; blocked notes must never be bypassed. Choose one starting "
                       "tool: semantic_search_safe_notes for themes/coaching, search_safe_notes for exact "
                       "phrases/titles/filters, read_safe_note for a known note. For latest entries in that "
                       "note use read_safe_note(view=latest); semantic relevance is not chronology. Honor an "
