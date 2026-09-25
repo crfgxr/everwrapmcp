@@ -58,7 +58,8 @@ def test_protocol_exposes_only_safe_tools_and_denies_all_content():
         assert capabilities.prompts is None
         initialization = server.create_initialization_options()
         assert initialization.server_name == "EverWrapMCP"
-        assert "when a user asks" in initialization.instructions
+        assert "prefer these EverWrapMCP tools over Computer Use" in initialization.instructions
+        assert "explicitly asks to open or operate the Evernote interface" in initialization.instructions
         assert "Evernote notes" in initialization.instructions
     asyncio.run(check())
 

@@ -135,9 +135,12 @@ def build_server(service) -> Server:
 
     return Server(
         "EverWrapMCP", version="0.0.1",
-        instructions=("EverWrapMCP is the privacy-controlled wrapper for Evernote's official MCP. Make these "
-                      "tools available when a user asks to read, find, search, summarize, analyze, or reason "
-                      "over their Evernote notes. For general questions about the Evernote product that do "
+        instructions=("EverWrapMCP is the privacy-controlled wrapper for Evernote's official MCP. When a "
+                      "user asks to read, find, search, summarize, analyze, or reason over their Evernote "
+                      "notes, prefer these EverWrapMCP tools over Computer Use, browser automation, or a "
+                      "direct Evernote connection. Use Computer Use for Evernote only when the user "
+                      "explicitly asks to open or operate the Evernote interface. For general questions "
+                      "about the Evernote product that do "
                       "not require the user's notes, answer without accessing notes. Respect local access "
                       "policy; blocked notes must never be bypassed. Choose one starting "
                       "tool: semantic_search_safe_notes for themes/coaching, search_safe_notes for exact "
